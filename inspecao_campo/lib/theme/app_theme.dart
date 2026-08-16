@@ -88,3 +88,55 @@ Color colorForSyncStatus(String status) {
       return AppColors.draft;
   }
 }
+
+Color colorForWorkOrderStatus(String status) {
+  switch (status) {
+    case 'open':
+      return AppColors.draft;
+    case 'in_progress':
+      return AppColors.pending;
+    case 'done':
+      return AppColors.synced;
+    default:
+      return AppColors.draft;
+  }
+}
+
+String labelForWorkOrderStatus(String status) {
+  switch (status) {
+    case 'open':
+      return 'ABERTA';
+    case 'in_progress':
+      return 'EM ANDAMENTO';
+    case 'done':
+      return 'CONCLUÍDA';
+    default:
+      return status.toUpperCase();
+  }
+}
+
+Color colorForPriority(String priority) {
+  switch (priority) {
+    case 'high':
+      return AppColors.priorityHigh;
+    case 'medium':
+      return AppColors.priorityMedium;
+    case 'low':
+      return AppColors.priorityLow;
+    default:
+      return AppColors.priorityLow;
+  }
+}
+
+String labelForPriority(String priority) {
+  switch (priority) {
+    case 'high':
+      return 'ALTA';
+    case 'medium':
+      return 'MÉDIA';
+    case 'low':
+      return 'BAIXA';
+    default:
+      return priority.toUpperCase();
+  }
+}
