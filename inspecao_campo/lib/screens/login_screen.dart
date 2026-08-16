@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../services/auth_service.dart';
+import '../services/token_storage.dart';
+import '../services/user_storage.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -11,26 +14,44 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final AuthService _authService = AuthService();
   bool _obscurePassword = true;
+
   bool _isLoading = false;
   String? _errorMessage;
 
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  void _handleLogin() {
-    // ----placeholder
+  void _handleLogin() async {
     setState(() {
       _errorMessage = null;
       _isLoading = true;
     });
-  }
 
+    try { 
+    final result = await _authService.login(
+      _emailController.text.trim(),
+      _passwordController.text,
+    );
+
+    await TokenStorage.saveToken(result.accessToken);
+    await UserStorage.saveUser(result.user);
+
+    if (!mounted) return;
+
+    Navigator.of(context).pushReplacementNamed('/work-orders');
+  } on AuthException catch (e) {
+    setState(() => _errorMessage = e.message);
+  } finally {
+    if (mounted) setState(() => _isLoading =false);
+  }
+}
   @override
+    void dispose() {
+      _emailController.dispose();
+      _passwordController.dispose();
+      super.dispose();
+    }
+
+    @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
