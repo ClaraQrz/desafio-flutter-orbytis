@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inspecao_campo/screens/inspection_form_screen.dart';
 import '../models/user.dart';
 import '../models/work_order.dart';
 import '../services/token_storage.dart';
@@ -126,7 +127,13 @@ class _WorkOrdersScreenState extends State<WorkOrdersScreen> {
             padding: const EdgeInsets.all(16),
             itemCount: _workOrders.length,
             itemBuilder: (context, index) {
-              return _WorkOrderCard(workOrder: _workOrders[index]);
+              final workOrder = _workOrders[index];
+              return InkWell(
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => InspectionFormScreen(workOrder: workOrder)),
+                ),
+                child: _WorkOrderCard(workOrder: workOrder),
+              );
             },
           ),
         );
