@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:inspecao_campo/screens/inspection_form_screen.dart';
 import '../models/user.dart';
 import '../models/work_order.dart';
 import '../services/token_storage.dart';
 import '../services/user_storage.dart';
 import '../services/work_orders_service.dart';
 import '../theme/app_theme.dart';
+import 'inspection_form_screen.dart';
+import 'history_screen.dart';
 
 class WorkOrdersScreen extends StatefulWidget {
   const WorkOrdersScreen({super.key});
@@ -23,6 +24,7 @@ class _WorkOrdersScreenState extends State<WorkOrdersScreen> {
   _ScreenState _state = _ScreenState.loading;
   List<WorkOrder> _workOrders = [];
   String? _errorMessage;
+  bool _isSessionExpired = false;
 
   @override
   void initState() {
@@ -47,6 +49,7 @@ class _WorkOrdersScreenState extends State<WorkOrdersScreen> {
     } on WorkOrdersException catch (e) {
       setState(() {
         _errorMessage = e.message;
+        _isSessionExpired = e.isSessionExpired;
         _state = _ScreenState.error;
       });
     }
@@ -64,7 +67,10 @@ class _WorkOrdersScreenState extends State<WorkOrdersScreen> {
       appBar: AppBar(
         title: Text(_user != null ? 'Olá, ${_user!.name}' : 'Ordens de Serviço'),
         actions: [
-          IconButton(icon: const Icon(Icons.history), onPressed: () => Navigator.of(context).pushNamed('/history'),
+          IconButton(
+            icon: const Icon(Icons.history),
+            onPressed: () => Navigator.of(context)
+                .push(MaterialPageRoute(builder: (_) => const HistoryScreen())),
           ),
           IconButton(icon: const Icon(Icons.logout), onPressed: _handleLogout),
         ],
@@ -84,43 +90,49 @@ class _WorkOrdersScreenState extends State<WorkOrdersScreen> {
           child: ListView(
             children: const [
               SizedBox(height: 120),
-              Center(child: Text('Nenhuma ordem de serviço no momento.')),
+              Center(child: Text('Nenhuma OS no momento.')),
             ],
           ),
         );
 
       case _ScreenState.error:
-  return RefreshIndicator(
-    onRefresh: _loadWorkOrders,
-    child: ListView(
-      children: [
-        const SizedBox(height: 100),
-        Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
-            child: Column(
-              children: [
-                Text(
-                  _errorMessage ?? 'Falha ao carregar ordens de serviço.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.grey[700]),
-                ),
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: 200,
-                  child: OutlinedButton.icon(
-                    onPressed: _loadWorkOrders,
-                    icon: const Icon(Icons.refresh),
-                    label: const Text('Tentar novamente'),
+        return RefreshIndicator(
+          onRefresh: _loadWorkOrders,
+          child: ListView(
+            children: [
+              const SizedBox(height: 100),
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  child: Column(
+                    children: [
+                      Text(
+                        _errorMessage ?? 'Falha ao carregar OS.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.grey[700]),
+                      ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: 200,
+                        child: _isSessionExpired
+                      ? OutlinedButton.icon(
+                          onPressed: _handleLogout,
+                          icon: const Icon(Icons.login),
+                          label: const Text('Fazer login'),
+                        )
+                      : OutlinedButton.icon(
+                          onPressed: _loadWorkOrders,
+                          icon: const Icon(Icons.refresh),
+                          label: const Text('Tentar novamente'),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ),
-      ],
-    ),
-  );
+        );
 
       case _ScreenState.loaded:
         return RefreshIndicator(
@@ -132,7 +144,9 @@ class _WorkOrdersScreenState extends State<WorkOrdersScreen> {
               final workOrder = _workOrders[index];
               return InkWell(
                 onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => InspectionFormScreen(workOrder: workOrder)),
+                  MaterialPageRoute(
+                    builder: (_) => InspectionFormScreen(workOrder: workOrder),
+                  ),
                 ),
                 child: _WorkOrderCard(workOrder: workOrder),
               );
@@ -162,8 +176,7 @@ class _WorkOrderCard extends StatelessWidget {
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 4),
-            Text(workOrder.address,
-                style: TextStyle(color: Colors.grey[700])),
+            Text(workOrder.address, style: TextStyle(color: Colors.grey[700])),
             const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -214,8 +227,7 @@ class _Badge extends StatelessWidget {
           ],
           Text(
             label,
-            style: TextStyle(
-                color: color, fontWeight: FontWeight.bold, fontSize: 11),
+            style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 11),
           ),
         ],
       ),

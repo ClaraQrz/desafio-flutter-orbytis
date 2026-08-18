@@ -4,7 +4,8 @@ import 'api_client.dart';
 
 class WorkOrdersException implements Exception {
   final String message;
-  WorkOrdersException(this.message);
+  final bool isSessionExpired;
+  WorkOrdersException(this.message, {this.isSessionExpired = false});
 }
 
 class WorkOrdersService {
@@ -13,13 +14,17 @@ class WorkOrdersService {
       final response = await ApiClient.dio.get('/work-orders');
       final List<dynamic> data = response.data;
       return data
-        .map((json) => WorkOrder.fromJson(json as Map<String, dynamic>))
-        .toList();
+          .map((json) => WorkOrder.fromJson(json as Map<String, dynamic>))
+          .toList();
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        throw WorkOrdersException('Sessão expirada. Faça login novamente.');
+        throw WorkOrdersException(
+          'Sessão expirada. Faça login novamente.',
+          isSessionExpired: true,
+        );
       }
-      throw WorkOrdersException('Não foi possível carregar as ordens de serviço. Verifique sua conexão.');
+      throw WorkOrdersException(
+          'Não foi possível carregar as ordens de serviço. Verifique sua conexão.');
     }
   }
 }
