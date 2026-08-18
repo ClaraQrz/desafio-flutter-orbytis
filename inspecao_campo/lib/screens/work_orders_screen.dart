@@ -64,6 +64,8 @@ class _WorkOrdersScreenState extends State<WorkOrdersScreen> {
       appBar: AppBar(
         title: Text(_user != null ? 'Olá, ${_user!.name}' : 'Ordens de Serviço'),
         actions: [
+          IconButton(icon: const Icon(Icons.history), onPressed: () => Navigator.of(context).pushNamed('/history'),
+          ),
           IconButton(icon: const Icon(Icons.logout), onPressed: _handleLogout),
         ],
       ),

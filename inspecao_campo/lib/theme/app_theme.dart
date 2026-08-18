@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const primary = Color(0xFF1A4570);      // --azul escuro 
-  static const background = Color(0xFFF2F2F2);   // --fundo claro
+  static const primary = Color(0xFF1A4570);      
+  static const background = Color(0xFFF2F2F2);  
   static const surface = Colors.white;
 
-  // --status
-  static const draft = Color(0xFF8A8A8A);        // --cinza
-  static const pending = Color(0xFFE8A33D);      // --amarelo/âmbar
-  static const synced = Color(0xFF2E9E5B);       // --verde
-  static const failed = Color(0xFFD9463E);       // vermelho
+ 
+  static const draft = Color(0xFF8A8A8A);        
+  static const pending = Color(0xFFE8A33D);      
+  static const synced = Color(0xFF2E9E5B);      
+  static const failed = Color(0xFFD9463E);      
 
-  // --prioridade
+
   static const priorityHigh = Color(0xFFD9463E);
   static const priorityMedium = Color(0xFFE8A33D);
   static const priorityLow = Color(0xFF2E9E5B);
@@ -86,6 +86,21 @@ Color colorForSyncStatus(String status) {
       return AppColors.failed;
     default:
       return AppColors.draft;
+  }
+}
+
+String labelForSyncStatus(String status) {
+  switch (status) {
+    case 'draft':
+      return 'RASCUNHO';
+    case 'pending':
+      return 'PENDENTE';
+    case 'synced':
+      return 'SINCRONIZADO';
+    case 'failed':
+      return 'FALHOU';
+    default:
+      return status.toUpperCase();
   }
 }
 

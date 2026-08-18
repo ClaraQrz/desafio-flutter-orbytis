@@ -11,16 +11,15 @@ class SyncService {
 
   bool get isSyncing => _isSyncing;
 
-
   Future<int> syncAll() async {
-    if (_isSyncing) return 0;
+    if (_isSyncing) return 0; 
     _isSyncing = true;
     int successCount = 0;
 
     try {
       final pendingItems = await _repo.getPendingOrFailed();
       for (final inspection in pendingItems) {
-        final success = await _syncOne(inspection);
+        final success = await _syncSingle(inspection);
         if (success) successCount++;
       }
     } finally {
@@ -29,8 +28,10 @@ class SyncService {
 
     return successCount;
   }
-  
-  Future<bool> _syncOne(Inspection inspection) async {
+
+  Future<bool> syncOne(Inspection inspection) => _syncSingle(inspection);
+
+  Future<bool> _syncSingle(Inspection inspection) async {
     try {
       final formData = FormData.fromMap({
         'clientId': inspection.clientId,
@@ -50,7 +51,7 @@ class SyncService {
         await _repo.markAsSynced(inspection.id, serverId);
         return true;
       }
-      
+
       await _repo.markAsFailed(inspection.id, 'Resposta inesperada do servidor.');
       return false;
     } on DioException catch (e) {
