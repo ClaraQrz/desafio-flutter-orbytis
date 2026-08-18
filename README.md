@@ -18,12 +18,14 @@ Permite que técnicos de campo visualizem ordens de serviço, registrem inspeç�
 
 O projeto segue separação em camadas:
 
+```
 lib/
-├── models/ # Formato dos dados (User, WorkOrder)
-├── services/ # Comunicação com a API (AuthService, WorkOrdersService, SyncService)
-├── data/ # Persistência local (Drift/SQLite, InspectionRepository)
-├── screens/ # Telas (UI) + estado local
-└── theme/ # Cores, labels e estilos compartilhados
+├── models/       # Formato dos dados (User, WorkOrder)
+├── services/     # Comunicação com a API (AuthService, WorkOrdersService, SyncService)
+├── data/         # Persistência local (Drift/SQLite, InspectionRepository)
+├── screens/      # Telas (UI) + estado local
+└── theme/        # Cores, labels e estilos compartilhados
+```
 
 **Por que essa separação:** cada camada tem uma responsabilidade única. As telas não sabem como os dados são buscados ou salvos, elas só chamam métodos de `services`/`data` com nomes que descrevem a intenção (`login()`, `createDraft()`, `syncAll()`). Isso facilita testar e trocar peças isoladamente sem afetar o restante do app.
 
@@ -175,8 +177,9 @@ Com mais tempo, os próximos pontos seriam priorizados:
 - **Refinamento visual geral**: o app prioriza funcionalidade e cobertura dos critérios técnicos; uma segunda passada de UI/UX poderia melhorar o acabamento visual das telas.
 
 ## Estrutura do repositório
-
+```
 desafio-flutter-orbytis/
-├── README.md # Este arquivo
-├── mock-api/ # Servidor mock da API (Node.js)
+├── README.md       # Este arquivo
+├── mock-api/       # Servidor mock da API (Node.js)
 └── inspecao_campo/ # Aplicativo Flutter
+```
