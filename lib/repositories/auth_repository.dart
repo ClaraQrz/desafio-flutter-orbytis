@@ -5,12 +5,10 @@ import '../services/user_storage.dart';
 
 class AuthRepository {
   AuthRepository({
-    required AuthService authService,
-    required TokenStorage tokenStorage,
-    required UserStorage userStorage,
-  })  : _authService = authService,
-        _tokenStorage = tokenStorage,
-        _userStorage = userStorage;
+    required this._authService,
+    required this._tokenStorage,
+    required this._userStorage,
+  });
 
   final AuthService _authService;
   final TokenStorage _tokenStorage;

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../blocs/login/auth/auth_bloc.dart';
+import '../blocs/auth/auth_bloc.dart';
+
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
-  @override
+  @override //chamar somente um navigator
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {

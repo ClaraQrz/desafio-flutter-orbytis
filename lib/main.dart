@@ -8,7 +8,7 @@ import 'screens/work_orders_screen.dart';
 import 'screens/history_screen.dart';
 
 import 'blocs/login/login_bloc.dart';
-import 'blocs/login/auth/auth_bloc.dart';
+import 'blocs/auth/auth_bloc.dart';
 
 import 'repositories/auth_repository.dart';
 import 'services/auth_service.dart';

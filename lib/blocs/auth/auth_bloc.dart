@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import '../../../models/user.dart';
+import '../../models/user.dart';
 import 'package:inspecampo/repositories/auth_repository.dart';
 
 part 'auth_event.dart';
