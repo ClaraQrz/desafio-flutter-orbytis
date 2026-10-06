@@ -4,12 +4,12 @@ class AppColors {
 
   static const loginTop = Color(0xFF3C096C);
   static const loginBottom = Color(0xFF7512D2);
-  static const loginCard = Color(0xFFE5E1D3);
+  static const loginCard = Color(0xFFFFFFFF);
   static const loginButton = Color(0xFF5A189A);
 
   static const primary = Color(0xFF7512D2);
   static const background = Color(0xFF3C096C);
-  static const surface = Color(0xFFE5E1D3);
+  static const surface = Color(0xFFFFFFFF);
 
 
   static const draft = Color(0xFF8A8A8A);
@@ -21,6 +21,10 @@ class AppColors {
   static const priorityHigh = Color(0xFFD9463E);
   static const priorityMedium = Color(0xFFE8A33D);
   static const priorityLow = Color(0xFF2E9E5B);
+
+  static const navBar = Color(0xFF2A0A52);
+  static const navIndicator = Color(0xFF5A189A);
+  static const tabInactive = Color(0xFFF1EFF5);
 }
 
 class AppGradient {
@@ -28,6 +32,12 @@ class AppGradient {
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
     colors: [AppColors.loginTop, AppColors.loginBottom]
+  );
+
+  static const main = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [AppColors.loginTop, AppColors.loginBottom],
   );
 }
 

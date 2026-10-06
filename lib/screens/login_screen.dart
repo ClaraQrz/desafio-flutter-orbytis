@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../blocs/auth/auth_bloc.dart';
 import '../blocs/login/login_bloc.dart';
+import '../router/app_router.dart';
 import '../theme/app_theme.dart';
 import 'package:auto_route/auto_route.dart';
 
@@ -46,15 +47,10 @@ class _LoginScreenState extends State<LoginScreen> {
           loading: () {},
 
           success: (user) {
-            context.read<AuthBloc>().add(
-              AuthEvent.loggedIn(user),
-            );
+            context.read<AuthBloc>().add(AuthEvent.loggedIn(user));
 
-            Navigator.of(context).pushReplacementNamed(
-              '/work-orders',
-            );
+            context.router.replaceAll([const WorkOrdersRoute()]);
           },
-
           failure: (_) {},
         );
       },
@@ -66,15 +62,11 @@ class _LoginScreenState extends State<LoginScreen> {
           body: Container(
             width: double.infinity,
             height: double.infinity,
-            decoration: BoxDecoration(
-              gradient: AppGradient.login,
-            ),
+            decoration: BoxDecoration(gradient: AppGradient.login),
             child: SafeArea(
               child: Center(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -113,9 +105,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 32),
 
                       Container(
-                        width: double.infinity,
+                        width: 350,
+                        height: 300,
                         padding: const EdgeInsets.only(
-                          top: 50,
+                          top: 40,
                           left: 20,
                           right: 20,
                           bottom: 20,
@@ -135,23 +128,20 @@ class _LoginScreenState extends State<LoginScreen> {
                           children: [
                             TextField(
                               controller: _emailController,
-                              keyboardType:
-                                  TextInputType.emailAddress,
+                              keyboardType: TextInputType.emailAddress,
                               decoration: const InputDecoration(
                                 labelText: 'E-mail',
-                                prefixIcon:
-                                    Icon(Icons.email_outlined),
+                                prefixIcon: Icon(Icons.email_outlined),
                                 border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius:
-                                      BorderRadius.all(
+                                  // borderSide: BorderSide(
+                                  // color: Color(0xFF838383),
+                                  //),
+                                  borderRadius: BorderRadius.all(
                                     Radius.circular(15),
                                   ),
                                 ),
                                 enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius:
-                                      BorderRadius.all(
+                                  borderRadius: BorderRadius.all(
                                     Radius.circular(15),
                                   ),
                                 ),
@@ -160,8 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     color: AppColors.primary,
                                     width: 2,
                                   ),
-                                  borderRadius:
-                                      BorderRadius.all(
+                                  borderRadius: BorderRadius.all(
                                     Radius.circular(15),
                                   ),
                                 ),
@@ -175,47 +164,32 @@ class _LoginScreenState extends State<LoginScreen> {
                               obscureText: _obscurePassword,
                               decoration: InputDecoration(
                                 labelText: 'Senha',
-                                prefixIcon: const Icon(
-                                  Icons.lock_outline,
-                                ),
+                                prefixIcon: const Icon(Icons.lock_outline),
                                 border: const OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius:
-                                      BorderRadius.all(
-                                    Radius.circular(15),
-                                  ),
+                                  borderRadius: .all(.circular(15)),
                                 ),
-                                enabledBorder:
-                                    const OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius:
-                                      BorderRadius.all(
-                                    Radius.circular(15),
-                                  ),
+                                enabledBorder: const OutlineInputBorder(
+                                  borderRadius: .all(.circular(15)),
                                 ),
-                                focusedBorder:
-                                    const OutlineInputBorder(
+                                focusedBorder: const OutlineInputBorder(
                                   borderSide: BorderSide(
                                     color: AppColors.primary,
                                     width: 2,
                                   ),
-                                  borderRadius:
-                                      BorderRadius.all(
+                                  borderRadius: BorderRadius.all(
                                     Radius.circular(15),
                                   ),
                                 ),
                                 suffixIcon: IconButton(
                                   icon: Icon(
                                     _obscurePassword
-                                        ? Icons
-                                            .visibility_outlined
-                                        : Icons
-                                            .visibility_off_outlined,
+                                        ? Icons.visibility_outlined
+                                        : Icons.visibility_off_outlined,
                                   ),
                                   onPressed: () {
                                     setState(() {
-                                      _obscurePassword =
-                                          !_obscurePassword;
+                                      _obscurePassword = !_obscurePassword;
                                     });
                                   },
                                 ),
@@ -242,25 +216,19 @@ class _LoginScreenState extends State<LoginScreen> {
                               width: 150,
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      AppColors.loginButton,
-                                  shape:
-                                      const RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.all(
+                                  backgroundColor: AppColors.loginButton,
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
                                       Radius.circular(15),
                                     ),
                                   ),
                                 ),
-                                onPressed: isLoading
-                                    ? null
-                                    : _handleLogin,
+                                onPressed: isLoading ? null : _handleLogin,
                                 child: isLoading
                                     ? const SizedBox(
                                         width: 20,
                                         height: 20,
-                                        child:
-                                            CircularProgressIndicator(
+                                        child: CircularProgressIndicator(
                                           color: Colors.white,
                                           strokeWidth: 2,
                                         ),
@@ -273,6 +241,17 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
 
                       const SizedBox(height: 40),
+
+                      const Text(
+                        'InspeCampo',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.loginButton,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
                     ],
                   ),
                 ),
