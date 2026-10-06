@@ -4,6 +4,5 @@ part of 'work_orders_bloc.dart';
 sealed class WorkOrdersEvent with _$WorkOrdersEvent {
   const factory WorkOrdersEvent.loadRequested() = WorkOrdersLoadRequested;
 
-  const factory WorkOrdersEvent.refreshRequested({Completer<void>? completer}) =
-      WorkOrdersRefreshRequested;
+  const factory WorkOrdersEvent.refreshRequested() = WorkOrdersRefreshRequested;
 }

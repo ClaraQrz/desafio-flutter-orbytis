@@ -5,7 +5,9 @@ import '../data/database.dart';
 import '../data/inspection_repository.dart';
 import '../services/sync_service.dart';
 import '../theme/app_theme.dart';
+import 'package:auto_route/auto_route.dart';
 
+@RoutePage()
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
 

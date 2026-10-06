@@ -7,7 +7,9 @@ import 'package:path/path.dart' as p;
 import '../data/database.dart';
 import '../data/inspection_repository.dart';
 import '../models/work_order.dart';
+import 'package:auto_route/auto_route.dart';
 
+@RoutePage()
 class InspectionFormScreen extends StatefulWidget {
   final WorkOrder workOrder;
   const InspectionFormScreen({super.key, required this.workOrder});

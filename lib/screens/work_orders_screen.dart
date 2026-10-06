@@ -1,30 +1,34 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inspecampo/blocs/auth/auth_bloc.dart';
 import 'package:inspecampo/blocs/work_orders/work_orders_bloc.dart';
-import 'package:path/path.dart';
 import '../models/user.dart';
 import '../models/work_order.dart';
+import '../repositories/work_orders_repository.dart'; 
+import '../router/app_router.dart';
 import '../services/token_storage.dart';
 import '../services/user_storage.dart';
 import '../services/work_orders_service.dart';
 import '../theme/app_theme.dart';
 import 'inspection_form_screen.dart';
 import 'history_screen.dart';
+import 'package:auto_route/auto_route.dart';
 
-class WorkOrdersScreen extends StatelessWidget {
+@RoutePage()
+class WorkOrdersScreen extends StatelessWidget implements AutoRouteWrapper { 
   const WorkOrdersScreen({super.key});
 
-  Future<void> _refresh(BuildContext context) {
-    final completer = Completer<void>();
-
-    context.read<WorkOrdersBloc>().add(
-      WorkOrdersEvent.refreshRequested(completer: completer),
+  @override
+  Widget wrappedRoute(BuildContext context) {
+    return BlocProvider(
+      create: (context) => WorkOrdersBloc(context.read<WorkOrdersRepository>())
+        ..add(const WorkOrdersEvent.loadRequested()),
+      child: this,
     );
+  }
 
-    return completer.future;
+  Future<void> _refresh(BuildContext context) {
+    return context.read<WorkOrdersBloc>().refresh();
   }
 
   void _reload(BuildContext context) {
@@ -44,9 +48,7 @@ class WorkOrdersScreen extends StatelessWidget {
     return BlocListener<AuthBloc, AuthState>(
       listenWhen: (_, current) => current is AuthUnauthenticated,
       listener: (context, _) {
-        Navigator.of(
-          context,
-        ).pushNamedAndRemoveUntil('/login', (route) => false);
+        context.router.replaceAll([const LoginRoute()]); 
       },
       child: Scaffold(
         appBar: AppBar(
@@ -60,9 +62,7 @@ class WorkOrdersScreen extends StatelessWidget {
           actions: [
             IconButton(
               icon: const Icon(Icons.history),
-              onPressed: () => Navigator.of(
-                context,
-              ).push(MaterialPageRoute(builder: (_) => const HistoryScreen())),
+              onPressed: () => context.router.push(const HistoryRoute()), 
             ),
             IconButton(
               icon: const Icon(Icons.logout),
@@ -120,19 +120,17 @@ class WorkOrdersScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-              WorkOrdersLoaded(:final workOrders) => RefreshIndicator(
+              WorkOrdersLoaded(:final WorkOrders) => RefreshIndicator(
                 onRefresh: () => _refresh(context),
                 child: ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
                   padding: const EdgeInsets.all(16),
-                  itemCount: workOrders.length,
+                  itemCount: WorkOrders.length,
                   itemBuilder: (context, index) {
-                    final workOrder = workOrders[index];
+                    final workOrder = WorkOrders[index];
                     return InkWell(
-                      onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              InspectionFormScreen(workOrder: workOrder),
-                        ),
+                      onTap: () => context.router.push( 
+                        InspectionFormRoute(workOrder: workOrder),
                       ),
                       child: _WorkOrderCard(workOrder: workOrder),
                     );
@@ -156,14 +154,18 @@ class _WorkOrderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      child: Padding(padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(workOrder.title,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),)
-        ],
-      ),)
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              workOrder.title,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -178,7 +180,10 @@ class _RefreshableList extends StatelessWidget {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: onRefresh,
-      child: ListView(children: children),
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: children,
+      ),
     );
   }
 }

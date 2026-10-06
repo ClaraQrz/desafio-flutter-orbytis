@@ -120,11 +120,11 @@ return refreshRequested(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  loadRequested,TResult Function( Completer<void>? completer)?  refreshRequested,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  loadRequested,TResult Function()?  refreshRequested,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case WorkOrdersLoadRequested() when loadRequested != null:
 return loadRequested();case WorkOrdersRefreshRequested() when refreshRequested != null:
-return refreshRequested(_that.completer);case _:
+return refreshRequested();case _:
   return orElse();
 
 }
@@ -142,11 +142,11 @@ return refreshRequested(_that.completer);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  loadRequested,required TResult Function( Completer<void>? completer)  refreshRequested,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  loadRequested,required TResult Function()  refreshRequested,}) {final _that = this;
 switch (_that) {
 case WorkOrdersLoadRequested():
 return loadRequested();case WorkOrdersRefreshRequested():
-return refreshRequested(_that.completer);}
+return refreshRequested();}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -160,11 +160,11 @@ return refreshRequested(_that.completer);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  loadRequested,TResult? Function( Completer<void>? completer)?  refreshRequested,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  loadRequested,TResult? Function()?  refreshRequested,}) {final _that = this;
 switch (_that) {
 case WorkOrdersLoadRequested() when loadRequested != null:
 return loadRequested();case WorkOrdersRefreshRequested() when refreshRequested != null:
-return refreshRequested(_that.completer);case _:
+return refreshRequested();case _:
   return null;
 
 }
@@ -208,69 +208,33 @@ String toString() {
 
 
 class WorkOrdersRefreshRequested implements WorkOrdersEvent {
-  const WorkOrdersRefreshRequested({this.completer});
+  const WorkOrdersRefreshRequested();
   
 
- final  Completer<void>? completer;
 
-/// Create a copy of WorkOrdersEvent
-/// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$WorkOrdersRefreshRequestedCopyWith<WorkOrdersRefreshRequested> get copyWith => _$WorkOrdersRefreshRequestedCopyWithImpl<WorkOrdersRefreshRequested>(this, _$identity);
+
 
 
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkOrdersRefreshRequested&&(identical(other.completer, completer) || other.completer == completer));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkOrdersRefreshRequested);
 }
 
 
 @override
-int get hashCode {
-    return Object.hash(runtimeType,completer);
-}
+int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-    return 'WorkOrdersEvent.refreshRequested(completer: $completer)';
+    return 'WorkOrdersEvent.refreshRequested()';
 }
 
 
 }
 
-/// @nodoc
-abstract mixin class $WorkOrdersRefreshRequestedCopyWith<$Res> implements $WorkOrdersEventCopyWith<$Res> {
-  factory $WorkOrdersRefreshRequestedCopyWith(WorkOrdersRefreshRequested value, $Res Function(WorkOrdersRefreshRequested) _then) = _$WorkOrdersRefreshRequestedCopyWithImpl;
-@useResult
-$Res call({
- Completer<void>? completer
-});
 
 
-
-
-}
-/// @nodoc
-class _$WorkOrdersRefreshRequestedCopyWithImpl<$Res>
-    implements $WorkOrdersRefreshRequestedCopyWith<$Res> {
-  _$WorkOrdersRefreshRequestedCopyWithImpl(this._self, this._then);
-
-  final WorkOrdersRefreshRequested _self;
-  final $Res Function(WorkOrdersRefreshRequested) _then;
-
-/// Create a copy of WorkOrdersEvent
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? completer = freezed,}) {
-  return _then(WorkOrdersRefreshRequested(
-completer: freezed == completer ? _self.completer : completer // ignore: cast_nullable_to_non_nullable
-as Completer<void>?,
-  ));
-}
-
-
-}
 
 /// @nodoc
 mixin _$WorkOrdersState {
