@@ -249,10 +249,10 @@ class _Header extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              IconButton(
-                icon: const Icon(Icons.sync, color: Colors.white),
-                onPressed: onSync,
-              ),
+              //IconButton(
+               // icon: const Icon(Icons.sync, color: Colors.white),
+               // onPressed: onSync,
+             // ),
             ],
           ),
           const SizedBox(height: 12),
