@@ -6,8 +6,13 @@ sealed class WorkOrdersState with _$WorkOrdersState {
 
   const factory WorkOrdersState.empty() = WorkOrdersEmpty;
 
-  const factory WorkOrdersState.loaded(List<WorkOrder> WorkOrders) =
+  const factory WorkOrdersState.loaded(List<WorkOrder> workOrders) =
       WorkOrdersLoaded;
+
+  const factory WorkOrdersState.refreshing({
+    required List<WorkOrder> workOrders,
+    required Completer<void> completer,
+  }) = WorkOrdersRefreshing;
 
   const factory WorkOrdersState.failure({
     required String message,

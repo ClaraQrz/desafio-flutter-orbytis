@@ -19,15 +19,14 @@ class WorkOrdersBloc extends Bloc<WorkOrdersEvent, WorkOrdersState> {
 
   final WorkOrdersRepository _repo;
 
-  Completer<void>? _refreshCompleter;
-
-
   Future<void> refresh() {
-    final pending = _refreshCompleter;
-    if (pending != null) return pending.future;
+    final current = state;
+    if (current is WorkOrdersRefreshing) {
+      return current.completer.future;
+    }
 
-    final completer = _refreshCompleter = Completer<void>();
-    add(const WorkOrdersEvent.refreshRequested());
+    final completer = Completer<void>();
+    add(WorkOrdersEvent.refreshRequested(completer));
     return completer.future;
   }
 
@@ -43,11 +42,24 @@ class WorkOrdersBloc extends Bloc<WorkOrdersEvent, WorkOrdersState> {
     WorkOrdersRefreshRequested event,
     Emitter<WorkOrdersState> emit,
   ) async {
+    final current = state;
+    final previous = switch (current) {
+      WorkOrdersLoaded(:final workOrders) => workOrders,
+      WorkOrdersRefreshing(:final workOrders) => workOrders,
+      _ => <WorkOrder>[],
+    };
+
+    emit(
+      WorkOrdersState.refreshing(
+        workOrders: previous,
+        completer: event.completer,
+      ),
+    );
+
     try {
       await _fetch(emit);
     } finally {
-      _refreshCompleter?.complete();
-      _refreshCompleter = null;
+      if (!event.completer.isCompleted) event.completer.complete();
     }
   }
 

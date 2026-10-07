@@ -6,12 +6,12 @@ import 'token_storage.dart';
 class ApiClient {
   static String get baseUrl {
     if (kIsWeb){
-      return 'http://192.168.88.231:3000';
+      return 'http://192.168.15.7:3000';
     } 
     if (Platform.isAndroid){
-      return 'http://192.168.88.231:3000';
+      return 'http://192.168.15.7:3000';
     }
-    return 'http://192.168.88.231:3000';
+    return 'http://192.168.15.7:3000';
     }
 
   static final Dio dio = Dio(

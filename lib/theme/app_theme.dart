@@ -28,17 +28,12 @@ class AppColors {
 }
 
 class AppGradient {
-  static const login = LinearGradient (
+  static const grad = LinearGradient (
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
     colors: [AppColors.loginTop, AppColors.loginBottom]
   );
 
-  static const main = LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: [AppColors.loginTop, AppColors.loginBottom],
-  );
 }
 
 class AppTheme {

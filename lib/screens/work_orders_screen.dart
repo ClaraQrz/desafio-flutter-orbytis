@@ -1,19 +1,18 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inspecampo/blocs/auth/auth_bloc.dart';
 import 'package:inspecampo/blocs/work_orders/work_orders_bloc.dart';
-import '../models/user.dart';
 import '../models/work_order.dart';
 import '../repositories/work_orders_repository.dart';
 import '../router/app_router.dart';
-import '../services/token_storage.dart';
-import '../services/user_storage.dart';
-import '../services/work_orders_service.dart';
 import '../theme/app_theme.dart';
-import 'inspection_form_screen.dart';
-import 'history_screen.dart';
-import 'package:auto_route/auto_route.dart';
 
+IconData _iconForWorkOrderStatus(String status) => switch (status) {
+  'done' => Icons.check_circle,
+  'in_progress' => Icons.schedule,
+  _ => Icons.description_outlined,
+};
 
 @RoutePage()
 class WorkOrdersScreen extends StatelessWidget implements AutoRouteWrapper {
@@ -23,8 +22,8 @@ class WorkOrdersScreen extends StatelessWidget implements AutoRouteWrapper {
   Widget wrappedRoute(BuildContext context) {
     return BlocProvider(
       create: (context) =>
-      WorkOrdersBloc(context.read<WorkOrdersRepository>())
-        ..add(const WorkOrdersEvent.loadRequested()),
+          WorkOrdersBloc(context.read<WorkOrdersRepository>())
+            ..add(const WorkOrdersEvent.loadRequested()),
       child: this,
     );
   }
@@ -54,151 +53,360 @@ class WorkOrdersScreen extends StatelessWidget implements AutoRouteWrapper {
       },
       child: Scaffold(
         body: Container(
-          decoration: const BoxDecoration(gradient: AppGradient.main),
-          child: SafeArea(bottom: false,
-              child: Column(
-                children: [
-                  _Header(OnSync: () => _reload(context)),
-                  Expanded(child: BlocBuilder<WorkOrdersBloc, WorkOrdersState>(
+          decoration: const BoxDecoration(gradient: AppGradient.grad),
+          child: SafeArea(
+            bottom: false,
+            child: Column(
+              children: [
+                _Header(onSync: () => _reload(context)),
+                Expanded(
+                  child: BlocBuilder<WorkOrdersBloc, WorkOrdersState>(
                     builder: (context, state) {
                       return switch (state) {
-                        WorkOrdersLoading() =>
-                            Center(child: CircularProgressIndicator(
-                              color: Colors.white,),
-                            ),
-                        WorkOrdersEmpty() =>
-                            _RefreshableList(onRefresh: () => _refresh(context),
-                              children: [ SizedBox(height: 120),
-                                Center(child: Text('Nenhuma OS no momento. ',
-                                  style: TextStyle(color: Colors.white70),
-),
-),
-                              ],)
-                    },
-                  )
-                  )
-                ],
-              )),
-        )
+                        WorkOrdersLoading() => const Center(
+                          child: CircularProgressIndicator(color: Colors.white),
+                        ),
 
-
-        appBar: AppBar(
-        title: BlocBuilder<AuthBloc, AuthState > (
-      builder: (context, state) {
-        final name = state is AuthAuthenticated ? state.user.name : null;
-
-        return Text(name != null ? 'Olá, $name' : 'Ordens de serviço');
-      },
-      ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.history),
-            onPressed: () => context.router.push(const HistoryRoute()),
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => _logout(context),
-          ),
-        ],
-      ),
-      body: BlocBuilder<WorkOrdersBloc, WorkOrdersState>(
-        builder: (context, state) {
-          return switch (state) {
-            WorkOrdersLoading() =>
-            const Center(
-              child: CircularProgressIndicator(),
-            ),
-
-            WorkOrdersEmpty() =>
-                _RefreshableList(
-                  onRefresh: () => _refresh(context),
-                  children: const [
-                    SizedBox(height: 120),
-                    Center(child: Text('Nenhuma OS no momento.')),
-                  ],
-                ),
-            WorkOrdersFailure(:final message, :final isSessionExpired) =>
-                _RefreshableList(
-                  onRefresh: () => _refresh(context),
-                  children: [
-                    const SizedBox(height: 100),
-                    Center(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 32),
-                        child: Column(
-                          children: [
-                            Text(
-                              message,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.grey[700]),
-                            ),
-                            const SizedBox(height: 16),
-                            SizedBox(
-                              width: 200,
-                              child: isSessionExpired
-                                  ? OutlinedButton.icon(
-                                onPressed: () => _sessionExpired(context),
-                                icon: const Icon(Icons.login),
-                                label: const Text('Fazer login'),
-                              )
-                                  : OutlinedButton.icon(
-                                onPressed: () => _reload(context),
-                                icon: const Icon(Icons.refresh),
-                                label: const Text('Tentar novamente'),
+                        WorkOrdersEmpty() => _RefreshableList(
+                          onRefresh: () => _refresh(context),
+                          children: const [
+                            SizedBox(height: 120),
+                            Center(
+                              child: Text(
+                                'Nenhuma OS no momento.',
+                                style: TextStyle(
+                                  fontFamily: 'Urbanist',
+                                  color: Colors.white70,
+                                ),
                               ),
                             ),
                           ],
                         ),
+
+                        WorkOrdersFailure(
+                          :final message,
+                          :final isSessionExpired,
+                        ) =>
+                          _RefreshableList(
+                            onRefresh: () => _refresh(context),
+                            children: [
+                              const SizedBox(height: 100),
+                              Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 32,
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        message,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontFamily: 'Urbanist',
+                                          color: Colors.white70,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      SizedBox(
+                                        width: 200,
+                                        child: isSessionExpired
+                                            ? FilledButton.icon(
+                                                style: _errorButtonStyle,
+                                                onPressed: () =>
+                                                    _sessionExpired(context),
+                                                icon: const Icon(Icons.login),
+                                                label: const Text(
+                                                  'Fazer login',
+                                                ),
+                                              )
+                                            : FilledButton.icon(
+                                                style: _errorButtonStyle,
+                                                onPressed: () =>
+                                                    _reload(context),
+                                                icon: const Icon(Icons.refresh),
+                                                label: const Text(
+                                                  'Tentar novamente',
+                                                ),
+                                              ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+
+                        WorkOrdersLoaded(:final workOrders) ||
+                        WorkOrdersRefreshing(
+                          :final workOrders,
+                        ) => RefreshIndicator(
+                          onRefresh: () => _refresh(context),
+                          child: ListView.builder(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                            itemCount: workOrders.length,
+                            itemBuilder: (context, index) {
+                              final workOrder = workOrders[index];
+                              return _WorkOrderCard(
+                                workOrder: workOrder,
+                                onTap: () => context.router.push(
+                                  InspectionFormRoute(workOrder: workOrder),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      };
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        bottomNavigationBar: NavigationBarTheme(
+          data: NavigationBarThemeData(
+            backgroundColor: AppColors.navBar,
+            indicatorColor: AppColors.navIndicator,
+            indicatorShape: const StadiumBorder(),
+            labelTextStyle: const WidgetStatePropertyAll(
+              TextStyle(
+                fontFamily: 'Urbanist',
+                color: Colors.white,
+                fontSize: 12,
+              ),
+            ),
+            iconTheme: const WidgetStatePropertyAll(
+              IconThemeData(color: Colors.white),
+            ),
+          ),
+          child: NavigationBar(
+            selectedIndex: 0,
+            onDestinationSelected: (i) {
+              if (i == 1) context.router.push(const HistoryRoute());
+              if (i == 2) _logout(context);
+            },
+            destinations: const [
+              NavigationDestination(
+                icon: Icon(Icons.home_rounded),
+                label: 'Início',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.history),
+                label: 'Histórico',
+              ),
+              NavigationDestination(icon: Icon(Icons.logout), label: 'Sair'),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+final _errorButtonStyle = FilledButton.styleFrom(
+  backgroundColor: Colors.white,
+  foregroundColor: AppColors.primary,
+);
+
+class _Header extends StatelessWidget {
+  const _Header({required this.onSync});
+
+  final VoidCallback onSync;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 8, 8, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'Inspe',
+                      style: TextStyle(
+                        fontFamily: 'Urbanist',
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
+                    TextSpan(
+                      text: 'Campo',
+                      style: TextStyle(
+                        fontFamily: 'Urbanist',
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ],
                 ),
-            WorkOrdersLoaded(:final WorkOrders) =>
-                RefreshIndicator(
-                  onRefresh: () => _refresh(context),
-                  child: ListView.builder(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.all(16),
-                    itemCount: WorkOrders.length,
-                    itemBuilder: (context, index) {
-                      final workOrder = WorkOrders[index];
-                      return InkWell(
-                        onTap: () =>
-                            context.router.push(
-                              InspectionFormRoute(workOrder: workOrder),
-                            ),
-                        child: _WorkOrderCard(workOrder: workOrder),
-                      );
-                    },
-                  ),
+                style: TextStyle(
+                  fontFamily: 'Urbanist',
+                  color: Colors.white,
+                  fontSize: 22,
                 ),
-          };
-        },
+              ),
+              const Spacer(),
+              IconButton(
+                icon: const Icon(Icons.sync, color: Colors.white),
+                onPressed: onSync,
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          BlocBuilder<AuthBloc, AuthState>(
+            builder: (context, state) {
+              final name = state is AuthAuthenticated ? state.user.name : null;
+
+              return Text(
+                name != null ? 'Olá, $name' : 'Ordens de serviço',
+                style: const TextStyle(
+                  fontFamily: 'Urbanist',
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'Aqui estão suas ordens de serviço',
+            style: TextStyle(
+              fontFamily: 'Urbanist',
+              color: Colors.white70,
+              fontSize: 15,
+            ),
+          ),
+        ],
       ),
-    ),);
+    );
   }
 }
 
 class _WorkOrderCard extends StatelessWidget {
   final WorkOrder workOrder;
+  final VoidCallback onTap;
 
-  const _WorkOrderCard({required this.workOrder});
+  const _WorkOrderCard({required this.workOrder, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              workOrder.title,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-          ],
+      elevation: 0,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            workOrder.code,
+                            style: const TextStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 13,
+                              color: Colors.black54,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        _StatusChip(status: workOrder.status),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      workOrder.title,
+                      style: const TextStyle(
+                        fontFamily: 'Urbanist',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    _InfoRow(icon: Icons.location_on, text: workOrder.address),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Icon(Icons.chevron_right, color: Colors.black45),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  const _InfoRow({required this.icon, required this.text});
+
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: AppColors.primary),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontFamily: 'Urbanist',
+              fontSize: 13,
+              color: Colors.black54,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _StatusChip extends StatelessWidget {
+  const _StatusChip({required this.status});
+
+  final String status;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = colorForWorkOrderStatus(status);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            labelForWorkOrderStatus(status),
+            style: TextStyle(
+              color: color,
+              fontFamily: 'Urbanist',
+              fontWeight: FontWeight.w600,
+              fontSize: 10,
+            ),
+          ),
+          const SizedBox(width: 4),
+          Icon(_iconForWorkOrderStatus(status), size: 14, color: color),
+        ],
       ),
     );
   }

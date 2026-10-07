@@ -62,7 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
           body: Container(
             width: double.infinity,
             height: double.infinity,
-            decoration: BoxDecoration(gradient: AppGradient.login),
+            decoration: BoxDecoration(gradient: AppGradient.grad),
             child: SafeArea(
               child: Center(
                 child: SingleChildScrollView(
@@ -84,8 +84,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         'Bem-vindo(a)',
                         textAlign: TextAlign.center,
                         style: TextStyle(
+                          fontFamily: 'Urbanist',
+                          fontWeight: FontWeight.w800,
                           fontSize: 32,
-                          fontWeight: FontWeight.bold,
                           color: Colors.white,
                           letterSpacing: 0.3,
                         ),
@@ -95,8 +96,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         'Para acessar, insira suas credenciais abaixo',
                         textAlign: TextAlign.center,
                         style: TextStyle(
+                          fontFamily: 'Urbanist',
+                          fontWeight: FontWeight.w400,
                           fontSize: 16,
-                          fontWeight: FontWeight.bold,
                           color: Colors.white,
                           letterSpacing: 0.3,
                         ),
@@ -106,7 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                       Container(
                         width: 350,
-                        height: 300,
+                        constraints: const BoxConstraints(maxWidth: 350),
                         padding: const EdgeInsets.only(
                           top: 40,
                           left: 20,
@@ -130,6 +132,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               controller: _emailController,
                               keyboardType: TextInputType.emailAddress,
                               decoration: const InputDecoration(
+                                labelStyle: TextStyle(
+                                  fontFamily: 'Urbanist',
+                                  fontWeight: FontWeight.w400,
+                                ),
                                 labelText: 'E-mail',
                                 prefixIcon: Icon(Icons.email_outlined),
                                 border: OutlineInputBorder(
@@ -163,6 +169,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               controller: _passwordController,
                               obscureText: _obscurePassword,
                               decoration: InputDecoration(
+                                labelStyle: TextStyle(
+                                  fontFamily: 'Urbanist',
+                                  fontWeight: FontWeight.w400,
+                                ),
                                 labelText: 'Senha',
                                 prefixIcon: const Icon(Icons.lock_outline),
                                 border: const OutlineInputBorder(
@@ -233,31 +243,55 @@ class _LoginScreenState extends State<LoginScreen> {
                                           strokeWidth: 2,
                                         ),
                                       )
-                                    : const Text('ENTRAR'),
+                                    : const Text('ENTRAR', style: TextStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontWeight: FontWeight.w600,
+                                      ),
                               ),
                             ),
+                            )
                           ],
                         ),
                       ),
 
                       const SizedBox(height: 40),
 
-                      const Text(
-                        'InspeCampo',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.loginButton,
-                          letterSpacing: 0.3,
+                      const Padding(
+                        padding: EdgeInsets.only(top: 40),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Inspe',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 28,
+                              fontFamily: 'Urbanist',
+                            fontWeight: FontWeight.w300,
+                            color: Color.fromARGB(255, 159, 86, 226),
+                            letterSpacing: 0.3,
+                          ),
                         ),
+                         Text(
+                          'Campo',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontFamily: 'Urbanist',
+                            fontWeight: FontWeight.w700,
+                            color: Color.fromARGB(255, 159, 86, 226),
+                            letterSpacing: 0.3,
                       ),
+                     )
                     ],
                   ),
                 ),
+                    ]
               ),
             ),
           ),
+         )
+          )
         );
       },
     );
