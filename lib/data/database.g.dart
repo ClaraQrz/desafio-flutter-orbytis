@@ -717,15 +717,582 @@ class InspectionsCompanion extends UpdateCompanion<Inspection> {
   }
 }
 
+class $CachedWorkOrdersTable extends CachedWorkOrders
+    with TableInfo<$CachedWorkOrdersTable, CachedWorkOrder> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedWorkOrdersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _codeMeta = const VerificationMeta('code');
+  @override
+  late final GeneratedColumn<String> code = GeneratedColumn<String>(
+    'code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _addressMeta = const VerificationMeta(
+    'address',
+  );
+  @override
+  late final GeneratedColumn<String> address = GeneratedColumn<String>(
+    'address',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _priorityMeta = const VerificationMeta(
+    'priority',
+  );
+  @override
+  late final GeneratedColumn<String> priority = GeneratedColumn<String>(
+    'priority',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _latitudeMeta = const VerificationMeta(
+    'latitude',
+  );
+  @override
+  late final GeneratedColumn<double> latitude = GeneratedColumn<double>(
+    'latitude',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _longitudeMeta = const VerificationMeta(
+    'longitude',
+  );
+  @override
+  late final GeneratedColumn<double> longitude = GeneratedColumn<double>(
+    'longitude',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    code,
+    title,
+    description,
+    address,
+    priority,
+    status,
+    latitude,
+    longitude,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_work_orders';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedWorkOrder> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('code')) {
+      context.handle(
+        _codeMeta,
+        code.isAcceptableOrUnknown(data['code']!, _codeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_codeMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_descriptionMeta);
+    }
+    if (data.containsKey('address')) {
+      context.handle(
+        _addressMeta,
+        address.isAcceptableOrUnknown(data['address']!, _addressMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_addressMeta);
+    }
+    if (data.containsKey('priority')) {
+      context.handle(
+        _priorityMeta,
+        priority.isAcceptableOrUnknown(data['priority']!, _priorityMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_priorityMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('latitude')) {
+      context.handle(
+        _latitudeMeta,
+        latitude.isAcceptableOrUnknown(data['latitude']!, _latitudeMeta),
+      );
+    }
+    if (data.containsKey('longitude')) {
+      context.handle(
+        _longitudeMeta,
+        longitude.isAcceptableOrUnknown(data['longitude']!, _longitudeMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CachedWorkOrder map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedWorkOrder(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      code: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}code'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      )!,
+      address: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}address'],
+      )!,
+      priority: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}priority'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      latitude: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}latitude'],
+      ),
+      longitude: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}longitude'],
+      ),
+    );
+  }
+
+  @override
+  $CachedWorkOrdersTable createAlias(String alias) {
+    return $CachedWorkOrdersTable(attachedDatabase, alias);
+  }
+}
+
+class CachedWorkOrder extends DataClass implements Insertable<CachedWorkOrder> {
+  final String id;
+  final String code;
+  final String title;
+  final String description;
+  final String address;
+  final String priority;
+  final String status;
+  final double? latitude;
+  final double? longitude;
+  const CachedWorkOrder({
+    required this.id,
+    required this.code,
+    required this.title,
+    required this.description,
+    required this.address,
+    required this.priority,
+    required this.status,
+    this.latitude,
+    this.longitude,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['code'] = Variable<String>(code);
+    map['title'] = Variable<String>(title);
+    map['description'] = Variable<String>(description);
+    map['address'] = Variable<String>(address);
+    map['priority'] = Variable<String>(priority);
+    map['status'] = Variable<String>(status);
+    if (!nullToAbsent || latitude != null) {
+      map['latitude'] = Variable<double>(latitude);
+    }
+    if (!nullToAbsent || longitude != null) {
+      map['longitude'] = Variable<double>(longitude);
+    }
+    return map;
+  }
+
+  CachedWorkOrdersCompanion toCompanion(bool nullToAbsent) {
+    return CachedWorkOrdersCompanion(
+      id: Value(id),
+      code: Value(code),
+      title: Value(title),
+      description: Value(description),
+      address: Value(address),
+      priority: Value(priority),
+      status: Value(status),
+      latitude: latitude == null && nullToAbsent
+          ? const Value.absent()
+          : Value(latitude),
+      longitude: longitude == null && nullToAbsent
+          ? const Value.absent()
+          : Value(longitude),
+    );
+  }
+
+  factory CachedWorkOrder.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedWorkOrder(
+      id: serializer.fromJson<String>(json['id']),
+      code: serializer.fromJson<String>(json['code']),
+      title: serializer.fromJson<String>(json['title']),
+      description: serializer.fromJson<String>(json['description']),
+      address: serializer.fromJson<String>(json['address']),
+      priority: serializer.fromJson<String>(json['priority']),
+      status: serializer.fromJson<String>(json['status']),
+      latitude: serializer.fromJson<double?>(json['latitude']),
+      longitude: serializer.fromJson<double?>(json['longitude']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'code': serializer.toJson<String>(code),
+      'title': serializer.toJson<String>(title),
+      'description': serializer.toJson<String>(description),
+      'address': serializer.toJson<String>(address),
+      'priority': serializer.toJson<String>(priority),
+      'status': serializer.toJson<String>(status),
+      'latitude': serializer.toJson<double?>(latitude),
+      'longitude': serializer.toJson<double?>(longitude),
+    };
+  }
+
+  CachedWorkOrder copyWith({
+    String? id,
+    String? code,
+    String? title,
+    String? description,
+    String? address,
+    String? priority,
+    String? status,
+    Value<double?> latitude = const Value.absent(),
+    Value<double?> longitude = const Value.absent(),
+  }) => CachedWorkOrder(
+    id: id ?? this.id,
+    code: code ?? this.code,
+    title: title ?? this.title,
+    description: description ?? this.description,
+    address: address ?? this.address,
+    priority: priority ?? this.priority,
+    status: status ?? this.status,
+    latitude: latitude.present ? latitude.value : this.latitude,
+    longitude: longitude.present ? longitude.value : this.longitude,
+  );
+  CachedWorkOrder copyWithCompanion(CachedWorkOrdersCompanion data) {
+    return CachedWorkOrder(
+      id: data.id.present ? data.id.value : this.id,
+      code: data.code.present ? data.code.value : this.code,
+      title: data.title.present ? data.title.value : this.title,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
+      address: data.address.present ? data.address.value : this.address,
+      priority: data.priority.present ? data.priority.value : this.priority,
+      status: data.status.present ? data.status.value : this.status,
+      latitude: data.latitude.present ? data.latitude.value : this.latitude,
+      longitude: data.longitude.present ? data.longitude.value : this.longitude,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedWorkOrder(')
+          ..write('id: $id, ')
+          ..write('code: $code, ')
+          ..write('title: $title, ')
+          ..write('description: $description, ')
+          ..write('address: $address, ')
+          ..write('priority: $priority, ')
+          ..write('status: $status, ')
+          ..write('latitude: $latitude, ')
+          ..write('longitude: $longitude')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    code,
+    title,
+    description,
+    address,
+    priority,
+    status,
+    latitude,
+    longitude,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedWorkOrder &&
+          other.id == this.id &&
+          other.code == this.code &&
+          other.title == this.title &&
+          other.description == this.description &&
+          other.address == this.address &&
+          other.priority == this.priority &&
+          other.status == this.status &&
+          other.latitude == this.latitude &&
+          other.longitude == this.longitude);
+}
+
+class CachedWorkOrdersCompanion extends UpdateCompanion<CachedWorkOrder> {
+  final Value<String> id;
+  final Value<String> code;
+  final Value<String> title;
+  final Value<String> description;
+  final Value<String> address;
+  final Value<String> priority;
+  final Value<String> status;
+  final Value<double?> latitude;
+  final Value<double?> longitude;
+  final Value<int> rowid;
+  const CachedWorkOrdersCompanion({
+    this.id = const Value.absent(),
+    this.code = const Value.absent(),
+    this.title = const Value.absent(),
+    this.description = const Value.absent(),
+    this.address = const Value.absent(),
+    this.priority = const Value.absent(),
+    this.status = const Value.absent(),
+    this.latitude = const Value.absent(),
+    this.longitude = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CachedWorkOrdersCompanion.insert({
+    required String id,
+    required String code,
+    required String title,
+    required String description,
+    required String address,
+    required String priority,
+    required String status,
+    this.latitude = const Value.absent(),
+    this.longitude = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       code = Value(code),
+       title = Value(title),
+       description = Value(description),
+       address = Value(address),
+       priority = Value(priority),
+       status = Value(status);
+  static Insertable<CachedWorkOrder> custom({
+    Expression<String>? id,
+    Expression<String>? code,
+    Expression<String>? title,
+    Expression<String>? description,
+    Expression<String>? address,
+    Expression<String>? priority,
+    Expression<String>? status,
+    Expression<double>? latitude,
+    Expression<double>? longitude,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (code != null) 'code': code,
+      if (title != null) 'title': title,
+      if (description != null) 'description': description,
+      if (address != null) 'address': address,
+      if (priority != null) 'priority': priority,
+      if (status != null) 'status': status,
+      if (latitude != null) 'latitude': latitude,
+      if (longitude != null) 'longitude': longitude,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CachedWorkOrdersCompanion copyWith({
+    Value<String>? id,
+    Value<String>? code,
+    Value<String>? title,
+    Value<String>? description,
+    Value<String>? address,
+    Value<String>? priority,
+    Value<String>? status,
+    Value<double?>? latitude,
+    Value<double?>? longitude,
+    Value<int>? rowid,
+  }) {
+    return CachedWorkOrdersCompanion(
+      id: id ?? this.id,
+      code: code ?? this.code,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      address: address ?? this.address,
+      priority: priority ?? this.priority,
+      status: status ?? this.status,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (code.present) {
+      map['code'] = Variable<String>(code.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (address.present) {
+      map['address'] = Variable<String>(address.value);
+    }
+    if (priority.present) {
+      map['priority'] = Variable<String>(priority.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (latitude.present) {
+      map['latitude'] = Variable<double>(latitude.value);
+    }
+    if (longitude.present) {
+      map['longitude'] = Variable<double>(longitude.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedWorkOrdersCompanion(')
+          ..write('id: $id, ')
+          ..write('code: $code, ')
+          ..write('title: $title, ')
+          ..write('description: $description, ')
+          ..write('address: $address, ')
+          ..write('priority: $priority, ')
+          ..write('status: $status, ')
+          ..write('latitude: $latitude, ')
+          ..write('longitude: $longitude, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $InspectionsTable inspections = $InspectionsTable(this);
+  late final $CachedWorkOrdersTable cachedWorkOrders = $CachedWorkOrdersTable(
+    this,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [inspections];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+    inspections,
+    cachedWorkOrders,
+  ];
 }
 
 typedef $$InspectionsTableCreateCompanionBuilder =
@@ -1072,10 +1639,305 @@ typedef $$InspectionsTableProcessedTableManager =
       Inspection,
       PrefetchHooks Function()
     >;
+typedef $$CachedWorkOrdersTableCreateCompanionBuilder =
+    CachedWorkOrdersCompanion Function({
+      required String id,
+      required String code,
+      required String title,
+      required String description,
+      required String address,
+      required String priority,
+      required String status,
+      Value<double?> latitude,
+      Value<double?> longitude,
+      Value<int> rowid,
+    });
+typedef $$CachedWorkOrdersTableUpdateCompanionBuilder =
+    CachedWorkOrdersCompanion Function({
+      Value<String> id,
+      Value<String> code,
+      Value<String> title,
+      Value<String> description,
+      Value<String> address,
+      Value<String> priority,
+      Value<String> status,
+      Value<double?> latitude,
+      Value<double?> longitude,
+      Value<int> rowid,
+    });
+
+class $$CachedWorkOrdersTableFilterComposer
+    extends Composer<_$AppDatabase, $CachedWorkOrdersTable> {
+  $$CachedWorkOrdersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get address => $composableBuilder(
+    column: $table.address,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get priority => $composableBuilder(
+    column: $table.priority,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get latitude => $composableBuilder(
+    column: $table.latitude,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get longitude => $composableBuilder(
+    column: $table.longitude,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CachedWorkOrdersTableOrderingComposer
+    extends Composer<_$AppDatabase, $CachedWorkOrdersTable> {
+  $$CachedWorkOrdersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get address => $composableBuilder(
+    column: $table.address,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get priority => $composableBuilder(
+    column: $table.priority,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get latitude => $composableBuilder(
+    column: $table.latitude,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get longitude => $composableBuilder(
+    column: $table.longitude,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedWorkOrdersTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CachedWorkOrdersTable> {
+  $$CachedWorkOrdersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get code =>
+      $composableBuilder(column: $table.code, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get address =>
+      $composableBuilder(column: $table.address, builder: (column) => column);
+
+  GeneratedColumn<String> get priority =>
+      $composableBuilder(column: $table.priority, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<double> get latitude =>
+      $composableBuilder(column: $table.latitude, builder: (column) => column);
+
+  GeneratedColumn<double> get longitude =>
+      $composableBuilder(column: $table.longitude, builder: (column) => column);
+}
+
+class $$CachedWorkOrdersTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CachedWorkOrdersTable,
+          CachedWorkOrder,
+          $$CachedWorkOrdersTableFilterComposer,
+          $$CachedWorkOrdersTableOrderingComposer,
+          $$CachedWorkOrdersTableAnnotationComposer,
+          $$CachedWorkOrdersTableCreateCompanionBuilder,
+          $$CachedWorkOrdersTableUpdateCompanionBuilder,
+          (
+            CachedWorkOrder,
+            BaseReferences<
+              _$AppDatabase,
+              $CachedWorkOrdersTable,
+              CachedWorkOrder
+            >,
+          ),
+          CachedWorkOrder,
+          PrefetchHooks Function()
+        > {
+  $$CachedWorkOrdersTableTableManager(
+    _$AppDatabase db,
+    $CachedWorkOrdersTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CachedWorkOrdersTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CachedWorkOrdersTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CachedWorkOrdersTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> code = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String> description = const Value.absent(),
+                Value<String> address = const Value.absent(),
+                Value<String> priority = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<double?> latitude = const Value.absent(),
+                Value<double?> longitude = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedWorkOrdersCompanion(
+                id: id,
+                code: code,
+                title: title,
+                description: description,
+                address: address,
+                priority: priority,
+                status: status,
+                latitude: latitude,
+                longitude: longitude,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String code,
+                required String title,
+                required String description,
+                required String address,
+                required String priority,
+                required String status,
+                Value<double?> latitude = const Value.absent(),
+                Value<double?> longitude = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedWorkOrdersCompanion.insert(
+                id: id,
+                code: code,
+                title: title,
+                description: description,
+                address: address,
+                priority: priority,
+                status: status,
+                latitude: latitude,
+                longitude: longitude,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CachedWorkOrdersTable, CachedWorkOrder>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $CachedWorkOrdersTable,
+                    CachedWorkOrder
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedWorkOrdersTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CachedWorkOrdersTable,
+      CachedWorkOrder,
+      $$CachedWorkOrdersTableFilterComposer,
+      $$CachedWorkOrdersTableOrderingComposer,
+      $$CachedWorkOrdersTableAnnotationComposer,
+      $$CachedWorkOrdersTableCreateCompanionBuilder,
+      $$CachedWorkOrdersTableUpdateCompanionBuilder,
+      (
+        CachedWorkOrder,
+        BaseReferences<_$AppDatabase, $CachedWorkOrdersTable, CachedWorkOrder>,
+      ),
+      CachedWorkOrder,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
   $$InspectionsTableTableManager get inspections =>
       $$InspectionsTableTableManager(_db, _db.inspections);
+  $$CachedWorkOrdersTableTableManager get cachedWorkOrders =>
+      $$CachedWorkOrdersTableTableManager(_db, _db.cachedWorkOrders);
 }

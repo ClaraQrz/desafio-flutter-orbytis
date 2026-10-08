@@ -503,13 +503,7 @@ String toString() {
 /// @nodoc
 mixin _$LocationState {
 
- LocationStatus get status;/// Posição atual do aparelho (atualizada em tempo real).
- double? get currentLatitude; double? get currentLongitude;/// Localização confirmada, a que será salva na inspeção.
- double? get latitude; double? get longitude;/// Distância em metros até o ponto da OS (null se a OS não tem coordenadas).
- double? get distanceMeters;/// true se o aparelho está dentro do raio permitido (ou se não há ponto).
- bool get isInRange;/// true quando a localização confirmada foi ajustada à mão.
- bool get isManual;/// Traçado da rota até a OS.
- List<LatLng> get route; String? get error;
+ LocationStatus get status; double? get currentLatitude; double? get currentLongitude; double? get latitude; double? get longitude; double? get distanceMeters; bool get isInRange; bool get isManual; List<LatLng> get route; String? get error;
 /// Create a copy of LocationState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -719,21 +713,14 @@ class _LocationState extends LocationState {
   
 
 @override@JsonKey() final  LocationStatus status;
-/// Posição atual do aparelho (atualizada em tempo real).
 @override final  double? currentLatitude;
 @override final  double? currentLongitude;
-/// Localização confirmada, a que será salva na inspeção.
 @override final  double? latitude;
 @override final  double? longitude;
-/// Distância em metros até o ponto da OS (null se a OS não tem coordenadas).
 @override final  double? distanceMeters;
-/// true se o aparelho está dentro do raio permitido (ou se não há ponto).
 @override@JsonKey() final  bool isInRange;
-/// true quando a localização confirmada foi ajustada à mão.
 @override@JsonKey() final  bool isManual;
-/// Traçado da rota até a OS.
  final  List<LatLng> _route;
-/// Traçado da rota até a OS.
 @override@JsonKey() List<LatLng> get route {
   if (_route is EqualUnmodifiableListView) return _route;
   // ignore: implicit_dynamic_type

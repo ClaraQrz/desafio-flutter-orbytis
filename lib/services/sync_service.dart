@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import '../data/database.dart';
-import '../data/inspection_repository.dart';
+import '../repositories/inspection_repository.dart';
 import 'api_client.dart';
 
 class SyncService {

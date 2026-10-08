@@ -1,7 +1,8 @@
 import 'dart:async';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../data/database.dart';
+import '../services/connectivity_service.dart';
 import '../services/sync_service.dart';
 import '../theme/app_theme.dart';
 import 'package:auto_route/auto_route.dart';
@@ -16,14 +17,14 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-  final _repo = InspectionRepository(appDatabase);
+  final _repo = InspectionRepository(database: appDatabase);
   late final SyncService _syncService;
 
   List<Inspection> _all = [];
-  String _filter = 'all'; 
+  String _filter = 'all';
   bool _isSyncing = false;
 
-  StreamSubscription<List<ConnectivityResult>>? _connectivitySub;
+  StreamSubscription<bool>? _connectivitySub;
 
   @override
   void initState() {
@@ -45,9 +46,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   void _listenToConnectivity() {
-    _connectivitySub =
-        Connectivity().onConnectivityChanged.listen((results) {
-      final isOnline = results.any((r) => r != ConnectivityResult.none);
+    _connectivitySub = context.read<ConnectivityService>().onChanged.listen((
+      isOnline,
+    ) {
       if (isOnline) _runSync(silent: true);
     });
   }
@@ -62,9 +63,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
       if (!silent) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(count > 0
-                ? '$count inspeção(ões) sincronizada(s).'
-                : 'Nada novo para sincronizar.'),
+            content: Text(
+              count > 0
+                  ? '$count inspeção(ões) sincronizada(s).'
+                  : 'Nada novo para sincronizar.',
+              style: TextStyle(
+                fontFamily: 'Urbanist',
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         );
       }
@@ -77,9 +84,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(success
-              ? 'Sincronizado com sucesso.'
-              : 'Falha ao sincronizar. Será tentado novamente mais tarde.'),
+          content: Text(
+            success
+                ? 'Sincronizado com sucesso.'
+                : 'Falha ao sincronizar. Será tentado novamente mais tarde.',
+            style: TextStyle(
+              fontFamily: 'Urbanist',
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ),
       );
     }
@@ -94,7 +107,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Histórico'),
+        title: const Text('Histórico', style: TextStyle(fontFamily: 'Urbanist', fontWeight: FontWeight.w600),),
         actions: [
           IconButton(
             icon: _isSyncing
@@ -102,7 +115,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
-                        color: Colors.white, strokeWidth: 2),
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
                   )
                 : const Icon(Icons.sync),
             onPressed: _isSyncing ? null : () => _runSync(),
@@ -114,7 +129,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           _buildFilterChips(),
           Expanded(
             child: _filtered.isEmpty
-                ? const Center(child: Text('Nenhuma inspeção neste filtro.'))
+                ? const Center(child: Text('Nenhuma inspeção neste filtro.', style: TextStyle(fontFamily: 'Urbanist', fontWeight: FontWeight.w500, color: Colors.white),))
                 : RefreshIndicator(
                     onRefresh: _loadInspections,
                     child: ListView.builder(
@@ -183,25 +198,31 @@ class _InspectionCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('OS #${inspection.workOrderId}',
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                  Text(
+                    'OS #${inspection.workOrderId}',
+                    style: const TextStyle(fontFamily: 'Urbanist', fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 4),
                   Text(
                     'Data/hora: ${_formatDate(inspection.capturedAt)}',
-                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                    style: TextStyle(fontFamily: 'Urbanist',color: Colors.grey[600], fontSize: 12),
                   ),
                   const SizedBox(height: 8),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
-                      color: colorForSyncStatus(inspection.status)
-                          .withValues(alpha: 0.15),
+                      color: colorForSyncStatus(
+                        inspection.status,
+                      ).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       labelForSyncStatus(inspection.status),
                       style: TextStyle(
+                        fontFamily: 'Urbanist',
                         color: colorForSyncStatus(inspection.status),
                         fontWeight: FontWeight.bold,
                         fontSize: 11,
@@ -213,7 +234,11 @@ class _InspectionCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     Text(
                       inspection.errorMessage!,
-                      style: const TextStyle(color: AppColors.failed, fontSize: 12),
+                      style: const TextStyle(
+                        fontFamily: 'Urbanist',
+                        color: AppColors.failed,
+                        fontSize: 12,
+                      ),
                     ),
                   ],
                 ],

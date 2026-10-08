@@ -17,13 +17,13 @@ import '../widgets/location_map_card.dart';
 @RoutePage()
 class InspectionFormScreen extends StatefulWidget implements AutoRouteWrapper {
   final WorkOrder workOrder;
+
   const InspectionFormScreen({super.key, required this.workOrder});
 
   @override
   Widget wrappedRoute(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-
         BlocProvider(
           create: (_) => LocationBloc(
             routeService: RouteService(),
@@ -56,7 +56,14 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
   }
 
   void _showSnack(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          msg,
+          style: TextStyle(fontFamily: 'Urbanist', fontWeight: FontWeight.w600),
+        ),
+      ),
+    );
   }
 
   Future<void> _pickPhoto() async {
@@ -86,20 +93,24 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
 
   void _saveDraft() {
     final loc = context.read<LocationBloc>().state;
-    context.read<InspectionFormBloc>().add(DraftSubmitted(
-          observation: _observationController.text,
-          latitude: loc.latitude,
-          longitude: loc.longitude,
-        ));
+    context.read<InspectionFormBloc>().add(
+      DraftSubmitted(
+        observation: _observationController.text,
+        latitude: loc.latitude,
+        longitude: loc.longitude,
+      ),
+    );
   }
 
   void _concludeInspection() {
     final loc = context.read<LocationBloc>().state;
-    context.read<InspectionFormBloc>().add(InspectionConcluded(
-          observation: _observationController.text,
-          latitude: loc.latitude,
-          longitude: loc.longitude,
-        ));
+    context.read<InspectionFormBloc>().add(
+      InspectionConcluded(
+        observation: _observationController.text,
+        latitude: loc.latitude,
+        longitude: loc.longitude,
+      ),
+    );
   }
 
   (String, IconData, Color) _statusChip(String status) {
@@ -143,7 +154,13 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
           foregroundColor: Colors.white,
           elevation: 0,
           scrolledUnderElevation: 0,
-          title: const Text('Ordem de Serviço'),
+          title: const Text(
+            'Ordem de Serviço',
+            style: TextStyle(
+              fontFamily: 'Urbanist',
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ),
         body: Container(
           clipBehavior: Clip.antiAlias,
@@ -157,40 +174,55 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
                 child: ListView(
                   padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
                   children: [
-
                     Row(
                       children: [
                         Expanded(
                           child: Text(
                             'OS #${wo.code}',
                             style: const TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                         _StatusChip(
-                            text: chipText, icon: chipIcon, color: chipColor),
+                          text: chipText,
+                          icon: chipIcon,
+                          color: chipColor,
+                        ),
                       ],
                     ),
                     const SizedBox(height: 6),
                     Text(
                       wo.title,
                       style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold),
+                        fontFamily: 'Urbanist',
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        const Icon(Icons.location_on,
-                            size: 18, color: AppColors.primary),
+                        const Icon(
+                          Icons.location_on,
+                          size: 18,
+                          color: AppColors.primary,
+                        ),
                         const SizedBox(width: 6),
                         Expanded(child: Text(wo.address)),
                       ],
                     ),
 
-
                     if (wo.description.isNotEmpty) ...[
                       const SizedBox(height: 20),
-                      const _SectionLabel('Descrição'),
+                      const _SectionLabel(
+                        'Descrição',
+                        style: TextStyle(
+                          fontFamily: 'Urbanist',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                       const SizedBox(height: 8),
                       Container(
                         padding: const EdgeInsets.all(12),
@@ -198,13 +230,24 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
                           color: const Color(0xFFF1F0F6),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: Text(wo.description),
+                        child: Text(
+                          wo.description,
+                          style: TextStyle(
+                            fontFamily: 'Urbanist',
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ],
 
-
                     const SizedBox(height: 20),
-                    const _SectionLabel('Observação'),
+                    const _SectionLabel(
+                      'Observação',
+                      style: TextStyle(
+                        fontFamily: 'Urbanist',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                     const SizedBox(height: 8),
                     TextField(
                       controller: _observationController,
@@ -212,12 +255,21 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
                       textCapitalization: TextCapitalization.sentences,
                       decoration: const InputDecoration(
                         hintText: 'Digite uma observação...',
+                        hintStyle: TextStyle(
+                          fontFamily: 'Urbanist',
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
 
-
                     const SizedBox(height: 20),
-                    const _SectionLabel('Registro fotográfico'),
+                    const _SectionLabel(
+                      'Registro fotográfico',
+                      style: TextStyle(
+                        fontFamily: 'Urbanist',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                     const SizedBox(height: 8),
                     BlocBuilder<InspectionFormBloc, InspectionFormState>(
                       buildWhen: (prev, curr) =>
@@ -245,9 +297,14 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
                       },
                     ),
 
-
                     const SizedBox(height: 20),
-                    const _SectionLabel('Localização'),
+                    const _SectionLabel(
+                      'Localização',
+                      style: TextStyle(
+                        fontFamily: 'Urbanist',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                     const SizedBox(height: 8),
                     BlocBuilder<LocationBloc, LocationState>(
                       builder: (context, state) {
@@ -265,7 +322,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
                           targetLongitude: wo.longitude,
                           route: state.route,
                           distanceMeters: state.distanceMeters,
-                          radiusMeters: kGeofenceRadiusMeters,
+                          radiusMeters: bloc.radiusMeters,
                           isInRange: state.isInRange,
                           isManual: state.isManual,
                           onRetry: () => bloc.add(const LocationRequested()),
@@ -273,10 +330,12 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
 
                           onLocationChanged: hasTarget
                               ? null
-                              : (lat, lng) => bloc.add(LocationManuallySet(
+                              : (lat, lng) => bloc.add(
+                                  LocationManuallySet(
                                     latitude: lat,
                                     longitude: lng,
-                                  )),
+                                  ),
+                                ),
                         );
                       },
                     ),
@@ -304,14 +363,16 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: ElevatedButton(
-                              onPressed:
-                                  submitting ? null : _concludeInspection,
+                              onPressed: submitting
+                                  ? null
+                                  : _concludeInspection,
                               child: submitting
                                   ? const SizedBox(
                                       width: 18,
                                       height: 18,
                                       child: CircularProgressIndicator(
-                                          strokeWidth: 2),
+                                        strokeWidth: 2,
+                                      ),
                                     )
                                   : const Text('Concluir inspeção'),
                             ),
@@ -331,7 +392,8 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
 }
 
 class _SectionLabel extends StatelessWidget {
-  const _SectionLabel(this.text);
+  const _SectionLabel(this.text, {required TextStyle style});
+
   final String text;
 
   @override
@@ -403,8 +465,11 @@ class _AddPhotoBox extends StatelessWidget {
                 : const Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.camera_alt_outlined,
-                          size: 30, color: AppColors.primary),
+                      Icon(
+                        Icons.camera_alt_outlined,
+                        size: 30,
+                        color: AppColors.primary,
+                      ),
                       SizedBox(height: 6),
                       Text(
                         'Adicionar imagem',
@@ -476,6 +541,7 @@ class _PhotoThumb extends StatelessWidget {
 
 class _DashedRRectPainter extends CustomPainter {
   _DashedRRectPainter({required this.color});
+
   final Color color;
 
   @override
@@ -485,10 +551,9 @@ class _DashedRRectPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5;
     final path = Path()
-      ..addRRect(RRect.fromRectAndRadius(
-        Offset.zero & size,
-        const Radius.circular(10),
-      ));
+      ..addRRect(
+        RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(10)),
+      );
     for (final metric in path.computeMetrics()) {
       var distance = 0.0;
       while (distance < metric.length) {

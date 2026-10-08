@@ -27,19 +27,40 @@ class Inspections extends Table {
   DateTimeColumn get syncedAt => dateTime().nullable()();
 }
 
-@DriftDatabase(tables: [Inspections])
+class CachedWorkOrders extends Table {
+  TextColumn get id => text()();
+  TextColumn get code => text()();
+  TextColumn get title => text()();
+  TextColumn get description => text()();
+  TextColumn get address => text()();
+  TextColumn get priority => text()();
+  TextColumn get status => text()();
+  RealColumn get latitude => real().nullable()();
+  RealColumn get longitude => real().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+@DriftDatabase(tables: [Inspections, CachedWorkOrders])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (m) => m.createAll(),
     onUpgrade: (m, from, to) async {
-      await m.drop(inspections);
-      await m.createAll();
+      if (from < 3) {
+        await m.drop(inspections);
+        await m.createAll();
+        return;
+      }
+      if (from < 4) {
+        await m.createTable(cachedWorkOrders);
+      }
     },
   );
 }

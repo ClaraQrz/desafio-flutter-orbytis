@@ -4,8 +4,8 @@ class WorkOrder {
   final String title;
   final String description;
   final String address;
-  final String priority;   // "high" | "medium" | "low"
-  final String status;     // "open" | "in_progress" | "done"
+  final String priority;
+  final String status;
   final double? latitude;
   final double? longitude;
 

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
@@ -11,7 +12,7 @@ part 'location_event.dart';
 part 'location_state.dart';
 part 'location_bloc.freezed.dart';
 
-const kGeofenceRadiusMeters = 10.0;
+const kGeofenceRadiusMeters = 50.0;
 
 const _routeRefreshMeters = 50.0;
 
@@ -44,9 +45,9 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
   bool get hasTarget => targetLatitude != null && targetLongitude != null;
 
   Future<void> _onRequested(
-    LocationRequested event,
-    Emitter<LocationState> emit,
-  ) async {
+      LocationRequested event,
+      Emitter<LocationState> emit,
+      ) async {
     if (state.isLoading) return;
 
     await _subscription?.cancel();
@@ -85,7 +86,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
           distanceFilter: 2,
         ),
       ).listen(
-        (p) => add(LocationUpdated(
+            (p) => add(LocationUpdated(
           latitude: p.latitude,
           longitude: p.longitude,
         )),
@@ -110,7 +111,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
 
   void _onConfirmed(LocationConfirmed event, Emitter<LocationState> emit) {
     if (!state.hasCurrent) return;
-    if (hasTarget && !state.isInRange) return; 
+    if (hasTarget && !state.isInRange) return;
 
     emit(state.copyWith(
       latitude: state.currentLatitude,
@@ -121,7 +122,6 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
   }
 
   void _onManuallySet(LocationManuallySet event, Emitter<LocationState> emit) {
-    
     if (hasTarget) return;
     emit(state.copyWith(
       latitude: event.latitude,
@@ -132,9 +132,9 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
   }
 
   Future<void> _onRouteRequested(
-    LocationRouteRequested event,
-    Emitter<LocationState> emit,
-  ) async {
+      LocationRouteRequested event,
+      Emitter<LocationState> emit,
+      ) async {
     final lat = state.currentLatitude;
     final lng = state.currentLongitude;
     if (lat == null || lng == null || !hasTarget) {
@@ -148,9 +148,9 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
         from: LatLng(lat, lng),
         to: LatLng(targetLatitude!, targetLongitude!),
       );
+      if (emit.isDone || state.isInRange) return;
       emit(state.copyWith(route: points));
     } catch (_) {
-
     } finally {
       _fetchingRoute = false;
     }
@@ -168,12 +168,22 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
       );
       inRange = distance <= radiusMeters;
     }
+
+    debugPrint(
+      '[GEO] pos=$lat,$lng alvo=$targetLatitude,$targetLongitude '
+          'dist=${distance?.toStringAsFixed(1)}m raio=${radiusMeters}m '
+          'dentro=$inRange',
+    );
+
+    if (inRange) _lastRouteOrigin = null;
+
     return state.copyWith(
       status: LocationStatus.success,
       currentLatitude: lat,
       currentLongitude: lng,
       distanceMeters: distance,
       isInRange: inRange,
+      route: inRange ? const <LatLng>[] : state.route,
       error: null,
     );
   }
