@@ -14,7 +14,6 @@ class Inspections extends Table {
 
   TextColumn get workOrderId => text()();
   TextColumn get observation => text()();
-  TextColumn get condition => text().nullable()();
   TextColumn get photoPath => text().nullable()();
 
   RealColumn get latitude => real().nullable()();
@@ -33,7 +32,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(

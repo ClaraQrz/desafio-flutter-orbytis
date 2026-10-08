@@ -45,7 +45,9 @@ class InspectionFormRoute extends PageRouteInfo<InspectionFormRouteArgs> {
     name,
     builder: (data) {
       final args = data.argsAs<InspectionFormRouteArgs>();
-      return InspectionFormScreen(key: args.key, workOrder: args.workOrder);
+      return WrappedRoute(
+        child: InspectionFormScreen(key: args.key, workOrder: args.workOrder),
+      );
     },
   );
 }

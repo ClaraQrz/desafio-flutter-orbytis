@@ -67,17 +67,6 @@ class $InspectionsTable extends Inspections
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _conditionMeta = const VerificationMeta(
-    'condition',
-  );
-  @override
-  late final GeneratedColumn<String> condition = GeneratedColumn<String>(
-    'condition',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
   static const VerificationMeta _photoPathMeta = const VerificationMeta(
     'photoPath',
   );
@@ -161,7 +150,6 @@ class $InspectionsTable extends Inspections
     serverId,
     workOrderId,
     observation,
-    condition,
     photoPath,
     latitude,
     longitude,
@@ -220,12 +208,6 @@ class $InspectionsTable extends Inspections
       );
     } else if (isInserting) {
       context.missing(_observationMeta);
-    }
-    if (data.containsKey('condition')) {
-      context.handle(
-        _conditionMeta,
-        condition.isAcceptableOrUnknown(data['condition']!, _conditionMeta),
-      );
     }
     if (data.containsKey('photo_path')) {
       context.handle(
@@ -303,10 +285,6 @@ class $InspectionsTable extends Inspections
         DriftSqlType.string,
         data['${effectivePrefix}observation'],
       )!,
-      condition: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}condition'],
-      ),
       photoPath: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}photo_path'],
@@ -350,7 +328,6 @@ class Inspection extends DataClass implements Insertable<Inspection> {
   final String? serverId;
   final String workOrderId;
   final String observation;
-  final String? condition;
   final String? photoPath;
   final double? latitude;
   final double? longitude;
@@ -364,7 +341,6 @@ class Inspection extends DataClass implements Insertable<Inspection> {
     this.serverId,
     required this.workOrderId,
     required this.observation,
-    this.condition,
     this.photoPath,
     this.latitude,
     this.longitude,
@@ -383,9 +359,6 @@ class Inspection extends DataClass implements Insertable<Inspection> {
     }
     map['work_order_id'] = Variable<String>(workOrderId);
     map['observation'] = Variable<String>(observation);
-    if (!nullToAbsent || condition != null) {
-      map['condition'] = Variable<String>(condition);
-    }
     if (!nullToAbsent || photoPath != null) {
       map['photo_path'] = Variable<String>(photoPath);
     }
@@ -415,9 +388,6 @@ class Inspection extends DataClass implements Insertable<Inspection> {
           : Value(serverId),
       workOrderId: Value(workOrderId),
       observation: Value(observation),
-      condition: condition == null && nullToAbsent
-          ? const Value.absent()
-          : Value(condition),
       photoPath: photoPath == null && nullToAbsent
           ? const Value.absent()
           : Value(photoPath),
@@ -449,7 +419,6 @@ class Inspection extends DataClass implements Insertable<Inspection> {
       serverId: serializer.fromJson<String?>(json['serverId']),
       workOrderId: serializer.fromJson<String>(json['workOrderId']),
       observation: serializer.fromJson<String>(json['observation']),
-      condition: serializer.fromJson<String?>(json['condition']),
       photoPath: serializer.fromJson<String?>(json['photoPath']),
       latitude: serializer.fromJson<double?>(json['latitude']),
       longitude: serializer.fromJson<double?>(json['longitude']),
@@ -468,7 +437,6 @@ class Inspection extends DataClass implements Insertable<Inspection> {
       'serverId': serializer.toJson<String?>(serverId),
       'workOrderId': serializer.toJson<String>(workOrderId),
       'observation': serializer.toJson<String>(observation),
-      'condition': serializer.toJson<String?>(condition),
       'photoPath': serializer.toJson<String?>(photoPath),
       'latitude': serializer.toJson<double?>(latitude),
       'longitude': serializer.toJson<double?>(longitude),
@@ -485,7 +453,6 @@ class Inspection extends DataClass implements Insertable<Inspection> {
     Value<String?> serverId = const Value.absent(),
     String? workOrderId,
     String? observation,
-    Value<String?> condition = const Value.absent(),
     Value<String?> photoPath = const Value.absent(),
     Value<double?> latitude = const Value.absent(),
     Value<double?> longitude = const Value.absent(),
@@ -499,7 +466,6 @@ class Inspection extends DataClass implements Insertable<Inspection> {
     serverId: serverId.present ? serverId.value : this.serverId,
     workOrderId: workOrderId ?? this.workOrderId,
     observation: observation ?? this.observation,
-    condition: condition.present ? condition.value : this.condition,
     photoPath: photoPath.present ? photoPath.value : this.photoPath,
     latitude: latitude.present ? latitude.value : this.latitude,
     longitude: longitude.present ? longitude.value : this.longitude,
@@ -519,7 +485,6 @@ class Inspection extends DataClass implements Insertable<Inspection> {
       observation: data.observation.present
           ? data.observation.value
           : this.observation,
-      condition: data.condition.present ? data.condition.value : this.condition,
       photoPath: data.photoPath.present ? data.photoPath.value : this.photoPath,
       latitude: data.latitude.present ? data.latitude.value : this.latitude,
       longitude: data.longitude.present ? data.longitude.value : this.longitude,
@@ -542,7 +507,6 @@ class Inspection extends DataClass implements Insertable<Inspection> {
           ..write('serverId: $serverId, ')
           ..write('workOrderId: $workOrderId, ')
           ..write('observation: $observation, ')
-          ..write('condition: $condition, ')
           ..write('photoPath: $photoPath, ')
           ..write('latitude: $latitude, ')
           ..write('longitude: $longitude, ')
@@ -561,7 +525,6 @@ class Inspection extends DataClass implements Insertable<Inspection> {
     serverId,
     workOrderId,
     observation,
-    condition,
     photoPath,
     latitude,
     longitude,
@@ -579,7 +542,6 @@ class Inspection extends DataClass implements Insertable<Inspection> {
           other.serverId == this.serverId &&
           other.workOrderId == this.workOrderId &&
           other.observation == this.observation &&
-          other.condition == this.condition &&
           other.photoPath == this.photoPath &&
           other.latitude == this.latitude &&
           other.longitude == this.longitude &&
@@ -595,7 +557,6 @@ class InspectionsCompanion extends UpdateCompanion<Inspection> {
   final Value<String?> serverId;
   final Value<String> workOrderId;
   final Value<String> observation;
-  final Value<String?> condition;
   final Value<String?> photoPath;
   final Value<double?> latitude;
   final Value<double?> longitude;
@@ -609,7 +570,6 @@ class InspectionsCompanion extends UpdateCompanion<Inspection> {
     this.serverId = const Value.absent(),
     this.workOrderId = const Value.absent(),
     this.observation = const Value.absent(),
-    this.condition = const Value.absent(),
     this.photoPath = const Value.absent(),
     this.latitude = const Value.absent(),
     this.longitude = const Value.absent(),
@@ -624,7 +584,6 @@ class InspectionsCompanion extends UpdateCompanion<Inspection> {
     this.serverId = const Value.absent(),
     required String workOrderId,
     required String observation,
-    this.condition = const Value.absent(),
     this.photoPath = const Value.absent(),
     this.latitude = const Value.absent(),
     this.longitude = const Value.absent(),
@@ -642,7 +601,6 @@ class InspectionsCompanion extends UpdateCompanion<Inspection> {
     Expression<String>? serverId,
     Expression<String>? workOrderId,
     Expression<String>? observation,
-    Expression<String>? condition,
     Expression<String>? photoPath,
     Expression<double>? latitude,
     Expression<double>? longitude,
@@ -657,7 +615,6 @@ class InspectionsCompanion extends UpdateCompanion<Inspection> {
       if (serverId != null) 'server_id': serverId,
       if (workOrderId != null) 'work_order_id': workOrderId,
       if (observation != null) 'observation': observation,
-      if (condition != null) 'condition': condition,
       if (photoPath != null) 'photo_path': photoPath,
       if (latitude != null) 'latitude': latitude,
       if (longitude != null) 'longitude': longitude,
@@ -674,7 +631,6 @@ class InspectionsCompanion extends UpdateCompanion<Inspection> {
     Value<String?>? serverId,
     Value<String>? workOrderId,
     Value<String>? observation,
-    Value<String?>? condition,
     Value<String?>? photoPath,
     Value<double?>? latitude,
     Value<double?>? longitude,
@@ -689,7 +645,6 @@ class InspectionsCompanion extends UpdateCompanion<Inspection> {
       serverId: serverId ?? this.serverId,
       workOrderId: workOrderId ?? this.workOrderId,
       observation: observation ?? this.observation,
-      condition: condition ?? this.condition,
       photoPath: photoPath ?? this.photoPath,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
@@ -717,9 +672,6 @@ class InspectionsCompanion extends UpdateCompanion<Inspection> {
     }
     if (observation.present) {
       map['observation'] = Variable<String>(observation.value);
-    }
-    if (condition.present) {
-      map['condition'] = Variable<String>(condition.value);
     }
     if (photoPath.present) {
       map['photo_path'] = Variable<String>(photoPath.value);
@@ -753,7 +705,6 @@ class InspectionsCompanion extends UpdateCompanion<Inspection> {
           ..write('serverId: $serverId, ')
           ..write('workOrderId: $workOrderId, ')
           ..write('observation: $observation, ')
-          ..write('condition: $condition, ')
           ..write('photoPath: $photoPath, ')
           ..write('latitude: $latitude, ')
           ..write('longitude: $longitude, ')
@@ -784,7 +735,6 @@ typedef $$InspectionsTableCreateCompanionBuilder =
       Value<String?> serverId,
       required String workOrderId,
       required String observation,
-      Value<String?> condition,
       Value<String?> photoPath,
       Value<double?> latitude,
       Value<double?> longitude,
@@ -800,7 +750,6 @@ typedef $$InspectionsTableUpdateCompanionBuilder =
       Value<String?> serverId,
       Value<String> workOrderId,
       Value<String> observation,
-      Value<String?> condition,
       Value<String?> photoPath,
       Value<double?> latitude,
       Value<double?> longitude,
@@ -841,11 +790,6 @@ class $$InspectionsTableFilterComposer
 
   ColumnFilters<String> get observation => $composableBuilder(
     column: $table.observation,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get condition => $composableBuilder(
-    column: $table.condition,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -919,11 +863,6 @@ class $$InspectionsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get condition => $composableBuilder(
-    column: $table.condition,
-    builder: (column) => ColumnOrderings(column),
-  );
-
   ColumnOrderings<String> get photoPath => $composableBuilder(
     column: $table.photoPath,
     builder: (column) => ColumnOrderings(column),
@@ -988,9 +927,6 @@ class $$InspectionsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<String> get condition =>
-      $composableBuilder(column: $table.condition, builder: (column) => column);
-
   GeneratedColumn<String> get photoPath =>
       $composableBuilder(column: $table.photoPath, builder: (column) => column);
 
@@ -1053,7 +989,6 @@ class $$InspectionsTableTableManager
                 Value<String?> serverId = const Value.absent(),
                 Value<String> workOrderId = const Value.absent(),
                 Value<String> observation = const Value.absent(),
-                Value<String?> condition = const Value.absent(),
                 Value<String?> photoPath = const Value.absent(),
                 Value<double?> latitude = const Value.absent(),
                 Value<double?> longitude = const Value.absent(),
@@ -1067,7 +1002,6 @@ class $$InspectionsTableTableManager
                 serverId: serverId,
                 workOrderId: workOrderId,
                 observation: observation,
-                condition: condition,
                 photoPath: photoPath,
                 latitude: latitude,
                 longitude: longitude,
@@ -1083,7 +1017,6 @@ class $$InspectionsTableTableManager
                 Value<String?> serverId = const Value.absent(),
                 required String workOrderId,
                 required String observation,
-                Value<String?> condition = const Value.absent(),
                 Value<String?> photoPath = const Value.absent(),
                 Value<double?> latitude = const Value.absent(),
                 Value<double?> longitude = const Value.absent(),
@@ -1097,7 +1030,6 @@ class $$InspectionsTableTableManager
                 serverId: serverId,
                 workOrderId: workOrderId,
                 observation: observation,
-                condition: condition,
                 photoPath: photoPath,
                 latitude: latitude,
                 longitude: longitude,

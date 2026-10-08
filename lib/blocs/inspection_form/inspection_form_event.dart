@@ -1,9 +1,12 @@
 part of 'inspection_form_bloc.dart';
 
 @freezed
-class InspectionFormEvent with _$InspectionFormEvent {
+sealed class InspectionFormEvent with _$InspectionFormEvent {
+
   const factory InspectionFormEvent.photoSourceSelected(ImageSource source) =
-      _PhotoSourceSelected;
+      PhotoSourceSelected;
+
+  const factory InspectionFormEvent.photoRemoved() = PhotoRemoved;
 
   const factory InspectionFormEvent.draftSubmitted({
     required String observation,

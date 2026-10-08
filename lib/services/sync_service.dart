@@ -37,7 +37,6 @@ class SyncService {
         'clientId': inspection.clientId,
         'workOrderId': inspection.workOrderId,
         'observation': inspection.observation,
-        if (inspection.condition != null) 'condition': inspection.condition,
         'latitude': inspection.latitude,
         'longitude': inspection.longitude,
         'capturedAt': inspection.capturedAt.toUtc().toIso8601String(),
