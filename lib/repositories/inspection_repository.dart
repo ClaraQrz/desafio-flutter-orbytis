@@ -11,13 +11,9 @@ abstract final class InspectionStatus {
 }
 
 class InspectionRepository {
-  InspectionRepository({required AppDatabase database, this.createdBy})
-    : _db = database;
+  InspectionRepository({required AppDatabase database}) : _db = database;
 
   final AppDatabase _db;
-
-  final String? createdBy;
-
   static const _uuid = Uuid();
 
   Future<String> createDraft({
@@ -26,6 +22,7 @@ class InspectionRepository {
     String? photoPath,
     double? latitude,
     double? longitude,
+    String? createdBy,
   }) {
     return _insert(
       status: InspectionStatus.draft,
@@ -34,6 +31,7 @@ class InspectionRepository {
       photoPath: photoPath,
       latitude: latitude,
       longitude: longitude,
+      createdBy: createdBy,
     );
   }
 
@@ -43,6 +41,7 @@ class InspectionRepository {
     required String photoPath,
     required double latitude,
     required double longitude,
+    String? createdBy,
   }) {
     return _insert(
       status: InspectionStatus.pending,
@@ -51,6 +50,7 @@ class InspectionRepository {
       photoPath: photoPath,
       latitude: latitude,
       longitude: longitude,
+      createdBy: createdBy,
     );
   }
 
@@ -146,6 +146,7 @@ class InspectionRepository {
     String? photoPath,
     double? latitude,
     double? longitude,
+    String? createdBy,
   }) async {
     final clientId = _uuid.v4();
     await _db

@@ -1,7 +1,6 @@
 import 'dart:async';
 
-import 'package:bloc/bloc.dart';
-import 'package:flutter/foundation.dart' show debugPrint;
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
@@ -17,15 +16,14 @@ const kGeofenceRadiusMeters = 50.0;
 const _routeRefreshMeters = 50.0;
 
 class LocationBloc extends Bloc<LocationEvent, LocationState> {
-    LocationBloc({
-    required RouteService routeService,
+  LocationBloc({
+    required this._routeService,
     this.targetLatitude,
     this.targetLongitude,
     this.radiusMeters = kGeofenceRadiusMeters,
     double? initialLatitude,
     double? initialLongitude,
-  })  : _routeService = routeService,
-        super(LocationState(
+  }) : super(LocationState(
           latitude: initialLatitude,
           longitude: initialLongitude,
         )) {
@@ -33,7 +31,6 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     on<LocationUpdated>(_onUpdated);
     on<LocationFailed>(_onFailed);
     on<LocationConfirmed>(_onConfirmed);
-    on<LocationManuallySet>(_onManuallySet);
     on<LocationRouteRequested>(_onRouteRequested);
   }
 
@@ -121,17 +118,6 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     emit(state.copyWith(
       latitude: state.currentLatitude,
       longitude: state.currentLongitude,
-      isManual: false,
-      error: null,
-    ));
-  }
-
-  void _onManuallySet(LocationManuallySet event, Emitter<LocationState> emit) {
-    if (hasTarget) return;
-    emit(state.copyWith(
-      latitude: event.latitude,
-      longitude: event.longitude,
-      isManual: true,
       error: null,
     ));
   }
@@ -173,12 +159,6 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
       );
       inRange = distance <= radiusMeters;
     }
-
-    debugPrint(
-      '[GEO] pos=$lat,$lng alvo=$targetLatitude,$targetLongitude '
-          'dist=${distance?.toStringAsFixed(1)}m raio=${radiusMeters}m '
-          'dentro=$inRange',
-    );
 
     if (inRange) _lastRouteOrigin = null;
 

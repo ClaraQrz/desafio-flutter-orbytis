@@ -1,18 +1,18 @@
 import 'package:drift/drift.dart';
-import 'package:inspecampo/data/database.dart';
-import 'package:inspecampo/models/work_order.dart';
-import 'package:inspecampo/repositories/inspection_repository.dart';
-import 'package:inspecampo/services/connectivity_service.dart';
-import 'package:inspecampo/services/work_orders_service.dart';
+
+import '../data/database.dart';
+import '../models/work_order.dart';
+import '../services/connectivity_service.dart';
+import '../services/work_orders_service.dart';
+import 'inspection_repository.dart';
 
 class WorkOrdersRepository {
   WorkOrdersRepository({
     required WorkOrdersService workOrdersService,
     required AppDatabase database,
-    required ConnectivityService connectivity,
+    required this._connectivity,
   })  : _service = workOrdersService,
-        _db = database,
-        _connectivity = connectivity;
+        _db = database;
 
   final WorkOrdersService _service;
   final AppDatabase _db;
@@ -30,7 +30,7 @@ class WorkOrdersRepository {
     try {
       final orders = await _service.getWorkOrders();
       await _saveCache(orders);
-      return _onlyAvailable(orders);
+      return await _onlyAvailable(orders);
     } on WorkOrdersException catch (e) {
       if (e.isSessionExpired) rethrow;
 
@@ -39,7 +39,7 @@ class WorkOrdersRepository {
       rethrow;
     }
   }
-  
+
   Future<WorkOrder?> getCachedWorkOrder(String id) async {
     final cached = await _readCache();
     for (final o in cached) {

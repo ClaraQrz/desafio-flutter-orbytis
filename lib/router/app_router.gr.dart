@@ -11,6 +11,72 @@
 part of 'app_router.dart';
 
 /// generated route for
+/// [ExpandedMapScreen]
+class ExpandedMapRoute extends PageRouteInfo<ExpandedMapRouteArgs> {
+  ExpandedMapRoute({
+    Key? key,
+    required WorkOrder workOrder,
+    required LocationBloc locationBloc,
+    List<PageRouteInfo>? children,
+  }) : super(
+         ExpandedMapRoute.name,
+         args: ExpandedMapRouteArgs(
+           key: key,
+           workOrder: workOrder,
+           locationBloc: locationBloc,
+         ),
+         initialChildren: children,
+       );
+
+  static const String name = 'ExpandedMapRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<ExpandedMapRouteArgs>();
+      return WrappedRoute(
+        child: ExpandedMapScreen(
+          key: args.key,
+          workOrder: args.workOrder,
+          locationBloc: args.locationBloc,
+        ),
+      );
+    },
+  );
+}
+
+class ExpandedMapRouteArgs {
+  const ExpandedMapRouteArgs({
+    this.key,
+    required this.workOrder,
+    required this.locationBloc,
+  });
+
+  final Key? key;
+
+  final WorkOrder workOrder;
+
+  final LocationBloc locationBloc;
+
+  @override
+  String toString() {
+    return 'ExpandedMapRouteArgs{key: $key, workOrder: $workOrder, locationBloc: $locationBloc}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ExpandedMapRouteArgs) return false;
+    return key == other.key &&
+        workOrder == other.workOrder &&
+        locationBloc == other.locationBloc;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ workOrder.hashCode ^ locationBloc.hashCode;
+}
+
+/// generated route for
 /// [HistoryScreen]
 class HistoryRoute extends PageRouteInfo<void> {
   const HistoryRoute({List<PageRouteInfo>? children})
@@ -114,6 +180,53 @@ class LoginRoute extends PageRouteInfo<void> {
       return const LoginScreen();
     },
   );
+}
+
+/// generated route for
+/// [PhotoViewerScreen]
+class PhotoViewerRoute extends PageRouteInfo<PhotoViewerRouteArgs> {
+  PhotoViewerRoute({
+    Key? key,
+    required String path,
+    List<PageRouteInfo>? children,
+  }) : super(
+         PhotoViewerRoute.name,
+         args: PhotoViewerRouteArgs(key: key, path: path),
+         initialChildren: children,
+       );
+
+  static const String name = 'PhotoViewerRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<PhotoViewerRouteArgs>();
+      return PhotoViewerScreen(key: args.key, path: args.path);
+    },
+  );
+}
+
+class PhotoViewerRouteArgs {
+  const PhotoViewerRouteArgs({this.key, required this.path});
+
+  final Key? key;
+
+  final String path;
+
+  @override
+  String toString() {
+    return 'PhotoViewerRouteArgs{key: $key, path: $path}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! PhotoViewerRouteArgs) return false;
+    return key == other.key && path == other.path;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ path.hashCode;
 }
 
 /// generated route for

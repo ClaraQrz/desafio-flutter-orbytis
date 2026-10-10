@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker/image_picker.dart';
 
 import '../blocs/auth/auth_bloc.dart';
 import '../blocs/inspection_form/inspection_form_bloc.dart';
@@ -11,9 +10,11 @@ import '../blocs/location/location_bloc.dart';
 import '../data/database.dart';
 import '../models/work_order.dart';
 import '../repositories/inspection_repository.dart';
+import '../router/app_router.dart';
+import '../services/photo_service.dart';
 import '../services/route_service.dart';
 import '../theme/app_theme.dart';
-import '../widgets/location_map_card.dart';
+import '../widgets/work_order_map_card.dart';
 
 @RoutePage()
 class InspectionFormScreen extends StatefulWidget implements AutoRouteWrapper {
@@ -55,9 +56,11 @@ class InspectionFormScreen extends StatefulWidget implements AutoRouteWrapper {
           },
         ),
         BlocProvider(
-          create: (_) => InspectionFormBloc(
-            InspectionRepository(database: appDatabase, createdBy: userName),
+          create: (context) => InspectionFormBloc(
+            context.read<InspectionRepository>(),
+            photoService: context.read<PhotoService>(),
             workOrderId: workOrder.id,
+            createdBy: userName,
             draft: draft,
           ),
         ),
@@ -104,26 +107,20 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
   }
 
   void _openPhoto(String path) {
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (_) => _PhotoViewerPage(path: path)));
+    context.router.push(PhotoViewerRoute(path: path));
   }
 
   void _openMapFullscreen() {
-    final bloc = context.read<LocationBloc>();
-    final wo = widget.workOrder;
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => BlocProvider.value(
-          value: bloc,
-          child: _FullScreenMapPage(workOrder: wo),
-        ),
+    context.router.push(
+      ExpandedMapRoute(
+        workOrder: widget.workOrder,
+        locationBloc: context.read<LocationBloc>(),
       ),
     );
   }
 
   Future<void> _pickPhoto() async {
-    final source = await showModalBottomSheet<ImageSource>(
+    final source = await showModalBottomSheet<PhotoSource>(
       context: context,
       builder: (context) => SafeArea(
         child: Column(
@@ -132,12 +129,12 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
             ListTile(
               leading: const Icon(Icons.camera_alt_outlined),
               title: const Text('Tirar foto'),
-              onTap: () => Navigator.of(context).pop(ImageSource.camera),
+              onTap: () => Navigator.of(context).pop(PhotoSource.camera),
             ),
             ListTile(
               leading: const Icon(Icons.photo_library_outlined),
               title: const Text('Escolher da galeria'),
-              onTap: () => Navigator.of(context).pop(ImageSource.gallery),
+              onTap: () => Navigator.of(context).pop(PhotoSource.gallery),
             ),
           ],
         ),
@@ -198,7 +195,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
               curr.message != null || (curr.isSuccess && !prev.isSuccess),
           listener: (context, state) {
             if (state.message != null) _showSnack(state.message!);
-            if (state.isSuccess) Navigator.of(context).pop();
+            if (state.isSuccess) context.router.maybePop();
           },
         ),
         BlocListener<LocationBloc, LocationState>(
@@ -378,13 +375,9 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
                         longitude: inspection?.longitude,
                       )
                     else
-                      BlocBuilder<LocationBloc, LocationState>(
-                        builder: (context, state) => _buildMapCard(
-                          context,
-                          state,
-                          wo,
-                          onExpand: _openMapFullscreen,
-                        ),
+                      WorkOrderMapCard(
+                        workOrder: wo,
+                        onExpand: _openMapFullscreen,
                       ),
                   ],
                 ),
@@ -746,97 +739,4 @@ class _DashedRRectPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _DashedRRectPainter old) => old.color != color;
-}
-
-Widget _buildMapCard(
-  BuildContext context,
-  LocationState state,
-  WorkOrder wo, {
-  VoidCallback? onExpand,
-  bool fillHeight = false,
-}) {
-  final bloc = context.read<LocationBloc>();
-  return LocationMapCard(
-    isLoading: state.isLoading,
-    error: state.error,
-    currentLatitude: state.currentLatitude,
-    currentLongitude: state.currentLongitude,
-    confirmedLatitude: state.latitude,
-    confirmedLongitude: state.longitude,
-    targetLatitude: wo.latitude,
-    targetLongitude: wo.longitude,
-    route: state.route,
-    distanceMeters: state.distanceMeters,
-    radiusMeters: bloc.radiusMeters,
-    isInRange: state.isInRange,
-    isManual: state.isManual,
-    onRetry: () => bloc.add(const LocationRequested()),
-    onConfirm: () => bloc.add(const LocationConfirmed()),
-    onExpand: onExpand,
-    fillHeight: fillHeight,
-  );
-}
-
-class _FullScreenMapPage extends StatelessWidget {
-  const _FullScreenMapPage({required this.workOrder});
-
-  final WorkOrder workOrder;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        title: const Text(
-          'Localização',
-          style: TextStyle(
-            fontFamily: 'Urbanist',
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
-      body: SafeArea(
-        child: BlocBuilder<LocationBloc, LocationState>(
-          builder: (context, state) =>
-              _buildMapCard(context, state, workOrder, fillHeight: true),
-        ),
-      ),
-    );
-  }
-}
-
-class _PhotoViewerPage extends StatelessWidget {
-  const _PhotoViewerPage({required this.path});
-
-  final String path;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
-      body: Center(
-        child: InteractiveViewer(
-          minScale: 1,
-          maxScale: 5,
-          child: Image.file(
-            File(path),
-            fit: BoxFit.contain,
-            errorBuilder: (_, _, _) => const Text(
-              'Não foi possível abrir a imagem.',
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 }

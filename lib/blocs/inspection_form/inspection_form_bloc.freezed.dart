@@ -126,7 +126,7 @@ return concluded(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( ImageSource source)?  photoSourceSelected,TResult Function()?  photoRemoved,TResult Function( String observation,  double? latitude,  double? longitude)?  draftSubmitted,TResult Function( String observation,  double? latitude,  double? longitude)?  concluded,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( PhotoSource source)?  photoSourceSelected,TResult Function()?  photoRemoved,TResult Function( String observation,  double? latitude,  double? longitude)?  draftSubmitted,TResult Function( String observation,  double? latitude,  double? longitude)?  concluded,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case PhotoSourceSelected() when photoSourceSelected != null:
 return photoSourceSelected(_that.source);case PhotoRemoved() when photoRemoved != null:
@@ -150,7 +150,7 @@ return concluded(_that.observation,_that.latitude,_that.longitude);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( ImageSource source)  photoSourceSelected,required TResult Function()  photoRemoved,required TResult Function( String observation,  double? latitude,  double? longitude)  draftSubmitted,required TResult Function( String observation,  double? latitude,  double? longitude)  concluded,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( PhotoSource source)  photoSourceSelected,required TResult Function()  photoRemoved,required TResult Function( String observation,  double? latitude,  double? longitude)  draftSubmitted,required TResult Function( String observation,  double? latitude,  double? longitude)  concluded,}) {final _that = this;
 switch (_that) {
 case PhotoSourceSelected():
 return photoSourceSelected(_that.source);case PhotoRemoved():
@@ -170,7 +170,7 @@ return concluded(_that.observation,_that.latitude,_that.longitude);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( ImageSource source)?  photoSourceSelected,TResult? Function()?  photoRemoved,TResult? Function( String observation,  double? latitude,  double? longitude)?  draftSubmitted,TResult? Function( String observation,  double? latitude,  double? longitude)?  concluded,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( PhotoSource source)?  photoSourceSelected,TResult? Function()?  photoRemoved,TResult? Function( String observation,  double? latitude,  double? longitude)?  draftSubmitted,TResult? Function( String observation,  double? latitude,  double? longitude)?  concluded,}) {final _that = this;
 switch (_that) {
 case PhotoSourceSelected() when photoSourceSelected != null:
 return photoSourceSelected(_that.source);case PhotoRemoved() when photoRemoved != null:
@@ -191,7 +191,7 @@ class PhotoSourceSelected implements InspectionFormEvent {
   const PhotoSourceSelected(this.source);
   
 
- final  ImageSource source;
+ final  PhotoSource source;
 
 /// Create a copy of InspectionFormEvent
 /// with the given fields replaced by the non-null parameter values.
@@ -225,7 +225,7 @@ abstract mixin class $PhotoSourceSelectedCopyWith<$Res> implements $InspectionFo
   factory $PhotoSourceSelectedCopyWith(PhotoSourceSelected value, $Res Function(PhotoSourceSelected) _then) = _$PhotoSourceSelectedCopyWithImpl;
 @useResult
 $Res call({
- ImageSource source
+ PhotoSource source
 });
 
 
@@ -245,7 +245,7 @@ class _$PhotoSourceSelectedCopyWithImpl<$Res>
 @pragma('vm:prefer-inline') $Res call({Object? source = null,}) {
   return _then(PhotoSourceSelected(
 null == source ? _self.source : source // ignore: cast_nullable_to_non_nullable
-as ImageSource,
+as PhotoSource,
   ));
 }
 

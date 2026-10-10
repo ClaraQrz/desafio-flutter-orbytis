@@ -13,10 +13,5 @@ sealed class LocationEvent with _$LocationEvent {
 
   const factory LocationEvent.confirmed() = LocationConfirmed;
 
-  const factory LocationEvent.manuallySet({
-    required double latitude,
-    required double longitude,
-  }) = LocationManuallySet;
-
   const factory LocationEvent.routeRequested() = LocationRouteRequested;
 }

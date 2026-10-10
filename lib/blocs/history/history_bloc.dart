@@ -15,10 +15,9 @@ part 'history_bloc.freezed.dart';
 class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
   HistoryBloc({
     required InspectionRepository repository,
-    required SyncService syncService,
+    required this._syncService,
     required ConnectivityService connectivity,
   })  : _repo = repository,
-        _syncService = syncService,
         super(const HistoryState()) {
     on<HistoryLoadRequested>(_onLoadRequested);
     on<HistoryFilterChanged>(_onFilterChanged);

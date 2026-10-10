@@ -19,8 +19,6 @@ abstract class LocationState with _$LocationState {
 
     @Default(false) bool isInRange,
 
-    @Default(false) bool isManual,
-
     @Default(<LatLng>[]) List<LatLng> route,
     String? error,
   }) = _LocationState;

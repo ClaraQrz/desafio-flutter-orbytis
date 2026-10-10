@@ -17,9 +17,8 @@ class LocationMapCard extends StatefulWidget {
     this.targetLongitude,
     this.route = const [],
     this.distanceMeters,
-    this.radiusMeters = 10,
+    required this.radiusMeters,
     this.isInRange = true,
-    this.isManual = false,
     this.error,
     this.onConfirm,
     this.onExpand,
@@ -46,7 +45,6 @@ class LocationMapCard extends StatefulWidget {
 
   final bool isInRange;
 
-  final bool isManual;
   final String? error;
 
   final VoidCallback? onConfirm;
@@ -81,8 +79,8 @@ class _LocationMapCardState extends State<LocationMapCard> {
     final target = _target;
     final confirmed = _confirmed;
     return [
-      if (current != null) current,
-      if (target != null) target,
+      ?current,
+      ?target,
       if (current == null && confirmed != null) confirmed,
       ...widget.route,
     ];
@@ -329,9 +327,7 @@ class _LocationMapCardState extends State<LocationMapCard> {
     if (confirmed) {
       color = AppColors.synced;
       icon = Icons.check_circle;
-      title = widget.isManual
-          ? 'Localização ajustada manualmente'
-          : 'Localização confirmada';
+      title = 'Localização confirmada';
       subtitle =
           '${widget.confirmedLatitude!.toStringAsFixed(4)}, '
           '${widget.confirmedLongitude!.toStringAsFixed(4)}';

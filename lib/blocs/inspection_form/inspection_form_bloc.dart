@@ -1,13 +1,9 @@
-import 'dart:io';
-
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 
 import '../../data/database.dart';
 import '../../repositories/inspection_repository.dart';
+import '../../services/photo_service.dart';
 
 part 'inspection_form_event.dart';
 part 'inspection_form_state.dart';
@@ -17,7 +13,9 @@ class InspectionFormBloc
     extends Bloc<InspectionFormEvent, InspectionFormState> {
   InspectionFormBloc(
     this._repo, {
+    required this._photoService,
     required this.workOrderId,
+    this.createdBy,
     Inspection? draft,
   })  : _draft = draft,
         super(InspectionFormState(photoPath: draft?.photoPath)) {
@@ -28,7 +26,10 @@ class InspectionFormBloc
   }
 
   final InspectionRepository _repo;
+  final PhotoService _photoService;
   final String workOrderId;
+
+  final String? createdBy;
 
   final Inspection? _draft;
 
@@ -47,22 +48,11 @@ class InspectionFormBloc
   ) async {
     emit(state.copyWith(status: InspectionFormStatus.pickingPhoto));
     try {
-      final xfile = await ImagePicker()
-          .pickImage(source: event.source, imageQuality: 80);
-      if (xfile == null) {
+      final savedPath = await _photoService.pick(event.source);
+      if (savedPath == null) {
         emit(state.copyWith(status: InspectionFormStatus.idle));
         return;
       }
-
-      final docsDir = await getApplicationDocumentsDirectory();
-      final photosDir = Directory(p.join(docsDir.path, 'inspection_photos'));
-      if (!await photosDir.exists()) await photosDir.create(recursive: true);
-
-      final savedPath = p.join(
-        photosDir.path,
-        '${DateTime.now().millisecondsSinceEpoch}.jpg',
-      );
-      await File(xfile.path).copy(savedPath);
 
       emit(state.copyWith(
         status: InspectionFormStatus.idle,
@@ -102,6 +92,7 @@ class InspectionFormBloc
           photoPath: state.photoPath,
           latitude: event.latitude,
           longitude: event.longitude,
+          createdBy: createdBy,
         );
       } else {
         await _repo.updateDraft(
@@ -152,6 +143,7 @@ class InspectionFormBloc
           photoPath: state.photoPath!,
           latitude: event.latitude!,
           longitude: event.longitude!,
+          createdBy: createdBy,
         );
       } else {
         await _repo.concludeDraft(

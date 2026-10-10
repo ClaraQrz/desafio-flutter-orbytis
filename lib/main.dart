@@ -13,6 +13,7 @@ import 'repositories/inspection_repository.dart';
 import 'repositories/work_orders_repository.dart';
 import 'services/auth_service.dart';
 import 'services/connectivity_service.dart';
+import 'services/photo_service.dart';
 import 'services/sync_service.dart';
 import 'services/work_orders_service.dart';
 import 'services/token_storage.dart';
@@ -40,6 +41,7 @@ void main() {
 
   final inspectionRepository = InspectionRepository(database: appDatabase);
   final syncService = SyncService(inspectionRepository);
+  final photoService = PhotoService();
 
   runApp(
     InspecaoCampoApp(
@@ -47,6 +49,7 @@ void main() {
       workOrdersRepository: workOrdersRepository,
       inspectionRepository: inspectionRepository,
       syncService: syncService,
+      photoService: photoService,
       connectivityService: connectivityService,
       appRouter: AppRouter(),
     ),
@@ -60,6 +63,7 @@ class InspecaoCampoApp extends StatelessWidget {
     required this.workOrdersRepository,
     required this.inspectionRepository,
     required this.syncService,
+    required this.photoService,
     required this.connectivityService,
     required this.appRouter,
   });
@@ -68,6 +72,7 @@ class InspecaoCampoApp extends StatelessWidget {
   final WorkOrdersRepository workOrdersRepository;
   final InspectionRepository inspectionRepository;
   final SyncService syncService;
+  final PhotoService photoService;
   final ConnectivityService connectivityService;
   final AppRouter appRouter;
 
@@ -78,6 +83,7 @@ class InspecaoCampoApp extends StatelessWidget {
         RepositoryProvider.value(value: workOrdersRepository),
         RepositoryProvider.value(value: inspectionRepository),
         RepositoryProvider.value(value: syncService),
+        RepositoryProvider.value(value: photoService),
         RepositoryProvider.value(value: connectivityService),
       ],
       child: MultiBlocProvider(

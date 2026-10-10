@@ -56,15 +56,14 @@ extension LocationEventPatterns on LocationEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( LocationRequested value)?  requested,TResult Function( LocationUpdated value)?  updated,TResult Function( LocationFailed value)?  failed,TResult Function( LocationConfirmed value)?  confirmed,TResult Function( LocationManuallySet value)?  manuallySet,TResult Function( LocationRouteRequested value)?  routeRequested,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( LocationRequested value)?  requested,TResult Function( LocationUpdated value)?  updated,TResult Function( LocationFailed value)?  failed,TResult Function( LocationConfirmed value)?  confirmed,TResult Function( LocationRouteRequested value)?  routeRequested,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case LocationRequested() when requested != null:
 return requested(_that);case LocationUpdated() when updated != null:
 return updated(_that);case LocationFailed() when failed != null:
 return failed(_that);case LocationConfirmed() when confirmed != null:
-return confirmed(_that);case LocationManuallySet() when manuallySet != null:
-return manuallySet(_that);case LocationRouteRequested() when routeRequested != null:
+return confirmed(_that);case LocationRouteRequested() when routeRequested != null:
 return routeRequested(_that);case _:
   return orElse();
 
@@ -83,15 +82,14 @@ return routeRequested(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( LocationRequested value)  requested,required TResult Function( LocationUpdated value)  updated,required TResult Function( LocationFailed value)  failed,required TResult Function( LocationConfirmed value)  confirmed,required TResult Function( LocationManuallySet value)  manuallySet,required TResult Function( LocationRouteRequested value)  routeRequested,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( LocationRequested value)  requested,required TResult Function( LocationUpdated value)  updated,required TResult Function( LocationFailed value)  failed,required TResult Function( LocationConfirmed value)  confirmed,required TResult Function( LocationRouteRequested value)  routeRequested,}){
 final _that = this;
 switch (_that) {
 case LocationRequested():
 return requested(_that);case LocationUpdated():
 return updated(_that);case LocationFailed():
 return failed(_that);case LocationConfirmed():
-return confirmed(_that);case LocationManuallySet():
-return manuallySet(_that);case LocationRouteRequested():
+return confirmed(_that);case LocationRouteRequested():
 return routeRequested(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
@@ -106,15 +104,14 @@ return routeRequested(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( LocationRequested value)?  requested,TResult? Function( LocationUpdated value)?  updated,TResult? Function( LocationFailed value)?  failed,TResult? Function( LocationConfirmed value)?  confirmed,TResult? Function( LocationManuallySet value)?  manuallySet,TResult? Function( LocationRouteRequested value)?  routeRequested,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( LocationRequested value)?  requested,TResult? Function( LocationUpdated value)?  updated,TResult? Function( LocationFailed value)?  failed,TResult? Function( LocationConfirmed value)?  confirmed,TResult? Function( LocationRouteRequested value)?  routeRequested,}){
 final _that = this;
 switch (_that) {
 case LocationRequested() when requested != null:
 return requested(_that);case LocationUpdated() when updated != null:
 return updated(_that);case LocationFailed() when failed != null:
 return failed(_that);case LocationConfirmed() when confirmed != null:
-return confirmed(_that);case LocationManuallySet() when manuallySet != null:
-return manuallySet(_that);case LocationRouteRequested() when routeRequested != null:
+return confirmed(_that);case LocationRouteRequested() when routeRequested != null:
 return routeRequested(_that);case _:
   return null;
 
@@ -132,14 +129,13 @@ return routeRequested(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  requested,TResult Function( double latitude,  double longitude)?  updated,TResult Function( String message)?  failed,TResult Function()?  confirmed,TResult Function( double latitude,  double longitude)?  manuallySet,TResult Function()?  routeRequested,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  requested,TResult Function( double latitude,  double longitude)?  updated,TResult Function( String message)?  failed,TResult Function()?  confirmed,TResult Function()?  routeRequested,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case LocationRequested() when requested != null:
 return requested();case LocationUpdated() when updated != null:
 return updated(_that.latitude,_that.longitude);case LocationFailed() when failed != null:
 return failed(_that.message);case LocationConfirmed() when confirmed != null:
-return confirmed();case LocationManuallySet() when manuallySet != null:
-return manuallySet(_that.latitude,_that.longitude);case LocationRouteRequested() when routeRequested != null:
+return confirmed();case LocationRouteRequested() when routeRequested != null:
 return routeRequested();case _:
   return orElse();
 
@@ -158,14 +154,13 @@ return routeRequested();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  requested,required TResult Function( double latitude,  double longitude)  updated,required TResult Function( String message)  failed,required TResult Function()  confirmed,required TResult Function( double latitude,  double longitude)  manuallySet,required TResult Function()  routeRequested,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  requested,required TResult Function( double latitude,  double longitude)  updated,required TResult Function( String message)  failed,required TResult Function()  confirmed,required TResult Function()  routeRequested,}) {final _that = this;
 switch (_that) {
 case LocationRequested():
 return requested();case LocationUpdated():
 return updated(_that.latitude,_that.longitude);case LocationFailed():
 return failed(_that.message);case LocationConfirmed():
-return confirmed();case LocationManuallySet():
-return manuallySet(_that.latitude,_that.longitude);case LocationRouteRequested():
+return confirmed();case LocationRouteRequested():
 return routeRequested();}
 }
 /// A variant of `when` that fallback to returning `null`
@@ -180,14 +175,13 @@ return routeRequested();}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  requested,TResult? Function( double latitude,  double longitude)?  updated,TResult? Function( String message)?  failed,TResult? Function()?  confirmed,TResult? Function( double latitude,  double longitude)?  manuallySet,TResult? Function()?  routeRequested,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  requested,TResult? Function( double latitude,  double longitude)?  updated,TResult? Function( String message)?  failed,TResult? Function()?  confirmed,TResult? Function()?  routeRequested,}) {final _that = this;
 switch (_that) {
 case LocationRequested() when requested != null:
 return requested();case LocationUpdated() when updated != null:
 return updated(_that.latitude,_that.longitude);case LocationFailed() when failed != null:
 return failed(_that.message);case LocationConfirmed() when confirmed != null:
-return confirmed();case LocationManuallySet() when manuallySet != null:
-return manuallySet(_that.latitude,_that.longitude);case LocationRouteRequested() when routeRequested != null:
+return confirmed();case LocationRouteRequested() when routeRequested != null:
 return routeRequested();case _:
   return null;
 
@@ -401,76 +395,6 @@ String toString() {
 /// @nodoc
 
 
-class LocationManuallySet implements LocationEvent {
-  const LocationManuallySet({required this.latitude, required this.longitude});
-  
-
- final  double latitude;
- final  double longitude;
-
-/// Create a copy of LocationEvent
-/// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$LocationManuallySetCopyWith<LocationManuallySet> get copyWith => _$LocationManuallySetCopyWithImpl<LocationManuallySet>(this, _$identity);
-
-
-
-@override
-bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is LocationManuallySet&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude));
-}
-
-
-@override
-int get hashCode {
-    return Object.hash(runtimeType,latitude,longitude);
-}
-
-@override
-String toString() {
-    return 'LocationEvent.manuallySet(latitude: $latitude, longitude: $longitude)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class $LocationManuallySetCopyWith<$Res> implements $LocationEventCopyWith<$Res> {
-  factory $LocationManuallySetCopyWith(LocationManuallySet value, $Res Function(LocationManuallySet) _then) = _$LocationManuallySetCopyWithImpl;
-@useResult
-$Res call({
- double latitude, double longitude
-});
-
-
-
-
-}
-/// @nodoc
-class _$LocationManuallySetCopyWithImpl<$Res>
-    implements $LocationManuallySetCopyWith<$Res> {
-  _$LocationManuallySetCopyWithImpl(this._self, this._then);
-
-  final LocationManuallySet _self;
-  final $Res Function(LocationManuallySet) _then;
-
-/// Create a copy of LocationEvent
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? latitude = null,Object? longitude = null,}) {
-  return _then(LocationManuallySet(
-latitude: null == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
-as double,longitude: null == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
-as double,
-  ));
-}
-
-
-}
-
-/// @nodoc
-
-
 class LocationRouteRequested implements LocationEvent {
   const LocationRouteRequested();
   
@@ -503,7 +427,7 @@ String toString() {
 /// @nodoc
 mixin _$LocationState {
 
- LocationStatus get status; double? get currentLatitude; double? get currentLongitude; double? get latitude; double? get longitude; double? get distanceMeters; bool get isInRange; bool get isManual; List<LatLng> get route; String? get error;
+ LocationStatus get status; double? get currentLatitude; double? get currentLongitude; double? get latitude; double? get longitude; double? get distanceMeters; bool get isInRange; List<LatLng> get route; String? get error;
 /// Create a copy of LocationState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -515,20 +439,20 @@ $LocationStateCopyWith<LocationState> get copyWith => _$LocationStateCopyWithImp
 @override
 bool operator ==(Object other) {
   final _this = this as LocationState;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LocationState&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.currentLatitude, _this.currentLatitude) || other.currentLatitude == _this.currentLatitude)&&(identical(other.currentLongitude, _this.currentLongitude) || other.currentLongitude == _this.currentLongitude)&&(identical(other.latitude, _this.latitude) || other.latitude == _this.latitude)&&(identical(other.longitude, _this.longitude) || other.longitude == _this.longitude)&&(identical(other.distanceMeters, _this.distanceMeters) || other.distanceMeters == _this.distanceMeters)&&(identical(other.isInRange, _this.isInRange) || other.isInRange == _this.isInRange)&&(identical(other.isManual, _this.isManual) || other.isManual == _this.isManual)&&const DeepCollectionEquality().equals(other.route, _this.route)&&(identical(other.error, _this.error) || other.error == _this.error));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LocationState&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.currentLatitude, _this.currentLatitude) || other.currentLatitude == _this.currentLatitude)&&(identical(other.currentLongitude, _this.currentLongitude) || other.currentLongitude == _this.currentLongitude)&&(identical(other.latitude, _this.latitude) || other.latitude == _this.latitude)&&(identical(other.longitude, _this.longitude) || other.longitude == _this.longitude)&&(identical(other.distanceMeters, _this.distanceMeters) || other.distanceMeters == _this.distanceMeters)&&(identical(other.isInRange, _this.isInRange) || other.isInRange == _this.isInRange)&&const DeepCollectionEquality().equals(other.route, _this.route)&&(identical(other.error, _this.error) || other.error == _this.error));
 }
 
 
 @override
 int get hashCode {
   final _this = this as LocationState;
-  return Object.hash(runtimeType,_this.status,_this.currentLatitude,_this.currentLongitude,_this.latitude,_this.longitude,_this.distanceMeters,_this.isInRange,_this.isManual,const DeepCollectionEquality().hash(_this.route),_this.error);
+  return Object.hash(runtimeType,_this.status,_this.currentLatitude,_this.currentLongitude,_this.latitude,_this.longitude,_this.distanceMeters,_this.isInRange,const DeepCollectionEquality().hash(_this.route),_this.error);
 }
 
 @override
 String toString() {
   final _this = this as LocationState;
-  return 'LocationState(status: ${_this.status}, currentLatitude: ${_this.currentLatitude}, currentLongitude: ${_this.currentLongitude}, latitude: ${_this.latitude}, longitude: ${_this.longitude}, distanceMeters: ${_this.distanceMeters}, isInRange: ${_this.isInRange}, isManual: ${_this.isManual}, route: ${_this.route}, error: ${_this.error})';
+  return 'LocationState(status: ${_this.status}, currentLatitude: ${_this.currentLatitude}, currentLongitude: ${_this.currentLongitude}, latitude: ${_this.latitude}, longitude: ${_this.longitude}, distanceMeters: ${_this.distanceMeters}, isInRange: ${_this.isInRange}, route: ${_this.route}, error: ${_this.error})';
 }
 
 
@@ -539,7 +463,7 @@ abstract mixin class $LocationStateCopyWith<$Res>  {
   factory $LocationStateCopyWith(LocationState value, $Res Function(LocationState) _then) = _$LocationStateCopyWithImpl;
 @useResult
 $Res call({
- LocationStatus status, double? currentLatitude, double? currentLongitude, double? latitude, double? longitude, double? distanceMeters, bool isInRange, bool isManual, List<LatLng> route, String? error
+ LocationStatus status, double? currentLatitude, double? currentLongitude, double? latitude, double? longitude, double? distanceMeters, bool isInRange, List<LatLng> route, String? error
 });
 
 
@@ -556,7 +480,7 @@ class _$LocationStateCopyWithImpl<$Res>
 
 /// Create a copy of LocationState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? currentLatitude = freezed,Object? currentLongitude = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? distanceMeters = freezed,Object? isInRange = null,Object? isManual = null,Object? route = null,Object? error = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? currentLatitude = freezed,Object? currentLongitude = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? distanceMeters = freezed,Object? isInRange = null,Object? route = null,Object? error = freezed,}) {
   return _then(LocationState(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as LocationStatus,currentLatitude: freezed == currentLatitude ? _self.currentLatitude : currentLatitude // ignore: cast_nullable_to_non_nullable
@@ -565,7 +489,6 @@ as double?,latitude: freezed == latitude ? _self.latitude : latitude // ignore: 
 as double?,longitude: freezed == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
 as double?,distanceMeters: freezed == distanceMeters ? _self.distanceMeters : distanceMeters // ignore: cast_nullable_to_non_nullable
 as double?,isInRange: null == isInRange ? _self.isInRange : isInRange // ignore: cast_nullable_to_non_nullable
-as bool,isManual: null == isManual ? _self.isManual : isManual // ignore: cast_nullable_to_non_nullable
 as bool,route: null == route ? _self.route : route // ignore: cast_nullable_to_non_nullable
 as List<LatLng>,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
 as String?,
@@ -653,10 +576,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( LocationStatus status,  double? currentLatitude,  double? currentLongitude,  double? latitude,  double? longitude,  double? distanceMeters,  bool isInRange,  bool isManual,  List<LatLng> route,  String? error)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( LocationStatus status,  double? currentLatitude,  double? currentLongitude,  double? latitude,  double? longitude,  double? distanceMeters,  bool isInRange,  List<LatLng> route,  String? error)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LocationState() when $default != null:
-return $default(_that.status,_that.currentLatitude,_that.currentLongitude,_that.latitude,_that.longitude,_that.distanceMeters,_that.isInRange,_that.isManual,_that.route,_that.error);case _:
+return $default(_that.status,_that.currentLatitude,_that.currentLongitude,_that.latitude,_that.longitude,_that.distanceMeters,_that.isInRange,_that.route,_that.error);case _:
   return orElse();
 
 }
@@ -674,10 +597,10 @@ return $default(_that.status,_that.currentLatitude,_that.currentLongitude,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( LocationStatus status,  double? currentLatitude,  double? currentLongitude,  double? latitude,  double? longitude,  double? distanceMeters,  bool isInRange,  bool isManual,  List<LatLng> route,  String? error)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( LocationStatus status,  double? currentLatitude,  double? currentLongitude,  double? latitude,  double? longitude,  double? distanceMeters,  bool isInRange,  List<LatLng> route,  String? error)  $default,) {final _that = this;
 switch (_that) {
 case _LocationState():
-return $default(_that.status,_that.currentLatitude,_that.currentLongitude,_that.latitude,_that.longitude,_that.distanceMeters,_that.isInRange,_that.isManual,_that.route,_that.error);case _:
+return $default(_that.status,_that.currentLatitude,_that.currentLongitude,_that.latitude,_that.longitude,_that.distanceMeters,_that.isInRange,_that.route,_that.error);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -694,10 +617,10 @@ return $default(_that.status,_that.currentLatitude,_that.currentLongitude,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( LocationStatus status,  double? currentLatitude,  double? currentLongitude,  double? latitude,  double? longitude,  double? distanceMeters,  bool isInRange,  bool isManual,  List<LatLng> route,  String? error)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( LocationStatus status,  double? currentLatitude,  double? currentLongitude,  double? latitude,  double? longitude,  double? distanceMeters,  bool isInRange,  List<LatLng> route,  String? error)?  $default,) {final _that = this;
 switch (_that) {
 case _LocationState() when $default != null:
-return $default(_that.status,_that.currentLatitude,_that.currentLongitude,_that.latitude,_that.longitude,_that.distanceMeters,_that.isInRange,_that.isManual,_that.route,_that.error);case _:
+return $default(_that.status,_that.currentLatitude,_that.currentLongitude,_that.latitude,_that.longitude,_that.distanceMeters,_that.isInRange,_that.route,_that.error);case _:
   return null;
 
 }
@@ -709,7 +632,7 @@ return $default(_that.status,_that.currentLatitude,_that.currentLongitude,_that.
 
 
 class _LocationState extends LocationState {
-  const _LocationState({this.status = LocationStatus.initial, this.currentLatitude, this.currentLongitude, this.latitude, this.longitude, this.distanceMeters, this.isInRange = false, this.isManual = false,  List<LatLng> route = const <LatLng>[], this.error}): _route = route,super._();
+  const _LocationState({this.status = LocationStatus.initial, this.currentLatitude, this.currentLongitude, this.latitude, this.longitude, this.distanceMeters, this.isInRange = false,  List<LatLng> route = const <LatLng>[], this.error}): _route = route,super._();
   
 
 @override@JsonKey() final  LocationStatus status;
@@ -719,7 +642,6 @@ class _LocationState extends LocationState {
 @override final  double? longitude;
 @override final  double? distanceMeters;
 @override@JsonKey() final  bool isInRange;
-@override@JsonKey() final  bool isManual;
  final  List<LatLng> _route;
 @override@JsonKey() List<LatLng> get route {
   if (_route is EqualUnmodifiableListView) return _route;
@@ -739,18 +661,18 @@ _$LocationStateCopyWith<_LocationState> get copyWith => __$LocationStateCopyWith
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _LocationState&&(identical(other.status, status) || other.status == status)&&(identical(other.currentLatitude, currentLatitude) || other.currentLatitude == currentLatitude)&&(identical(other.currentLongitude, currentLongitude) || other.currentLongitude == currentLongitude)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.distanceMeters, distanceMeters) || other.distanceMeters == distanceMeters)&&(identical(other.isInRange, isInRange) || other.isInRange == isInRange)&&(identical(other.isManual, isManual) || other.isManual == isManual)&&const DeepCollectionEquality().equals(other.route, _route)&&(identical(other.error, error) || other.error == error));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _LocationState&&(identical(other.status, status) || other.status == status)&&(identical(other.currentLatitude, currentLatitude) || other.currentLatitude == currentLatitude)&&(identical(other.currentLongitude, currentLongitude) || other.currentLongitude == currentLongitude)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.distanceMeters, distanceMeters) || other.distanceMeters == distanceMeters)&&(identical(other.isInRange, isInRange) || other.isInRange == isInRange)&&const DeepCollectionEquality().equals(other.route, _route)&&(identical(other.error, error) || other.error == error));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,status,currentLatitude,currentLongitude,latitude,longitude,distanceMeters,isInRange,isManual,const DeepCollectionEquality().hash(_route),error);
+    return Object.hash(runtimeType,status,currentLatitude,currentLongitude,latitude,longitude,distanceMeters,isInRange,const DeepCollectionEquality().hash(_route),error);
 }
 
 @override
 String toString() {
-    return 'LocationState(status: $status, currentLatitude: $currentLatitude, currentLongitude: $currentLongitude, latitude: $latitude, longitude: $longitude, distanceMeters: $distanceMeters, isInRange: $isInRange, isManual: $isManual, route: $route, error: $error)';
+    return 'LocationState(status: $status, currentLatitude: $currentLatitude, currentLongitude: $currentLongitude, latitude: $latitude, longitude: $longitude, distanceMeters: $distanceMeters, isInRange: $isInRange, route: $route, error: $error)';
 }
 
 
@@ -761,7 +683,7 @@ abstract mixin class _$LocationStateCopyWith<$Res> implements $LocationStateCopy
   factory _$LocationStateCopyWith(_LocationState value, $Res Function(_LocationState) _then) = __$LocationStateCopyWithImpl;
 @override @useResult
 $Res call({
- LocationStatus status, double? currentLatitude, double? currentLongitude, double? latitude, double? longitude, double? distanceMeters, bool isInRange, bool isManual, List<LatLng> route, String? error
+ LocationStatus status, double? currentLatitude, double? currentLongitude, double? latitude, double? longitude, double? distanceMeters, bool isInRange, List<LatLng> route, String? error
 });
 
 
@@ -778,7 +700,7 @@ class __$LocationStateCopyWithImpl<$Res>
 
 /// Create a copy of LocationState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? currentLatitude = freezed,Object? currentLongitude = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? distanceMeters = freezed,Object? isInRange = null,Object? isManual = null,Object? route = null,Object? error = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? currentLatitude = freezed,Object? currentLongitude = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? distanceMeters = freezed,Object? isInRange = null,Object? route = null,Object? error = freezed,}) {
   return _then(_LocationState(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as LocationStatus,currentLatitude: freezed == currentLatitude ? _self.currentLatitude : currentLatitude // ignore: cast_nullable_to_non_nullable
@@ -787,7 +709,6 @@ as double?,latitude: freezed == latitude ? _self.latitude : latitude // ignore: 
 as double?,longitude: freezed == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
 as double?,distanceMeters: freezed == distanceMeters ? _self.distanceMeters : distanceMeters // ignore: cast_nullable_to_non_nullable
 as double?,isInRange: null == isInRange ? _self.isInRange : isInRange // ignore: cast_nullable_to_non_nullable
-as bool,isManual: null == isManual ? _self.isManual : isManual // ignore: cast_nullable_to_non_nullable
 as bool,route: null == route ? _self._route : route // ignore: cast_nullable_to_non_nullable
 as List<LatLng>,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
 as String?,

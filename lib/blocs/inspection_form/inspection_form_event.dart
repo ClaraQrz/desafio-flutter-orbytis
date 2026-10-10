@@ -3,7 +3,7 @@ part of 'inspection_form_bloc.dart';
 @freezed
 sealed class InspectionFormEvent with _$InspectionFormEvent {
 
-  const factory InspectionFormEvent.photoSourceSelected(ImageSource source) =
+  const factory InspectionFormEvent.photoSourceSelected(PhotoSource source) =
       PhotoSourceSelected;
 
   const factory InspectionFormEvent.photoRemoved() = PhotoRemoved;

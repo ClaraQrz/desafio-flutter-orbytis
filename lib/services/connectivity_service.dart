@@ -1,5 +1,4 @@
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
-import 'package:flutter/foundation.dart' show debugPrint;
 
 class ConnectivityService {
   ConnectivityService({required Uri checkUri, InternetConnection? connection})
@@ -18,11 +17,9 @@ class ConnectivityService {
 
   Future<bool> isOnline() => _connection.hasInternetAccess;
 
-    Stream<bool> get onChanged => _connection.onStatusChange.map((status) {
-        final online = status == InternetStatus.connected;
-        debugPrint('[NET] mudou: online=$online');
-        return online;
-      });
+  Stream<bool> get onChanged => _connection.onStatusChange.map(
+    (status) => status == InternetStatus.connected,
+  );
 
   void dispose() => _connection.dispose();
 }

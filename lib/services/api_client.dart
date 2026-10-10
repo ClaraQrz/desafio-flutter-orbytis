@@ -1,18 +1,14 @@
 import 'package:dio/dio.dart';
-import 'dart:io' show Platform;
-import 'package:flutter/foundation.dart' show kIsWeb;
+
 import 'token_storage.dart';
 
 class ApiClient {
-  static String get baseUrl {
-    if (kIsWeb){
-      return 'http://192.168.15.7:3000';
-    } 
-    if (Platform.isAndroid){
-      return 'http://192.168.15.7:3000';
-    }
-    return 'http://192.168.15.7:3000';
-    }
+  /// Endereço da API. Para outro ambiente, sem mexer no código:
+  /// `flutter run --dart-define=API_BASE_URL=http://SEU_IP:3000`
+  static const baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://192.168.15.7:3000',
+  );
 
   static final Dio dio = Dio(
     BaseOptions(
@@ -23,8 +19,8 @@ class ApiClient {
   )..interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          final _tokenStorage = TokenStorage();
-          final token = await _tokenStorage.getToken();
+          final tokenStorage = TokenStorage();
+          final token = await tokenStorage.getToken();
           if (token != null) {
             options.headers['Authorization'] = 'Bearer $token';
           }

@@ -7,7 +7,6 @@ import '../models/work_order.dart';
 import '../repositories/work_orders_repository.dart';
 import '../router/app_router.dart';
 import '../theme/app_theme.dart';
-import '../data/database.dart';
 import '../repositories/inspection_repository.dart';
 
 IconData _iconForWorkOrderStatus(String status) => switch (status) {
@@ -47,14 +46,21 @@ class WorkOrdersScreen extends StatelessWidget implements AutoRouteWrapper {
   }
 
   Future<void> _openWorkOrder(BuildContext context, WorkOrder workOrder) async {
-    final draft = await InspectionRepository(
-      database: appDatabase,
-    ).getDraftFor(workOrder.id);
+    final draft = await context
+        .read<InspectionRepository>()
+        .getDraftFor(workOrder.id);
     if (!context.mounted) return;
 
     await context.router.push(
       InspectionFormRoute(workOrder: workOrder, draft: draft),
     );
+    if (context.mounted) _refresh(context);
+  }
+
+  /// Abre o histórico e, ao voltar, recarrega a lista (uma OS pode ter sido
+  /// concluída lá).
+  Future<void> _openHistory(BuildContext context) async {
+    await context.router.push(const HistoryRoute());
     if (context.mounted) _refresh(context);
   }
 
@@ -72,7 +78,7 @@ class WorkOrdersScreen extends StatelessWidget implements AutoRouteWrapper {
             bottom: false,
             child: Column(
               children: [
-                _Header(onSync: () => _reload(context)),
+                const _Header(),
                 Expanded(
                   child: BlocBuilder<WorkOrdersBloc, WorkOrdersState>(
                     builder: (context, state) {
@@ -194,12 +200,13 @@ class WorkOrdersScreen extends StatelessWidget implements AutoRouteWrapper {
           ),
           child: NavigationBar(
             selectedIndex: 0,
-                        onDestinationSelected: (i) async {
-              if (i == 1) {
-                await context.router.push(const HistoryRoute());
-                if (context.mounted) _refresh(context);
+            onDestinationSelected: (i) {
+              switch (i) {
+                case 1:
+                  _openHistory(context);
+                case 2:
+                  _logout(context);
               }
-              if (i == 2) _logout(context);
             },
             destinations: const [
               NavigationDestination(
@@ -225,9 +232,7 @@ final _errorButtonStyle = FilledButton.styleFrom(
 );
 
 class _Header extends StatelessWidget {
-  const _Header({required this.onSync});
-
-  final VoidCallback onSync;
+  const _Header();
 
   @override
   Widget build(BuildContext context) {
@@ -263,11 +268,6 @@ class _Header extends StatelessWidget {
                   fontSize: 22,
                 ),
               ),
-              const Spacer(),
-              //IconButton(
-               // icon: const Icon(Icons.sync, color: Colors.white),
-               // onPressed: onSync,
-             // ),
             ],
           ),
           const SizedBox(height: 12),

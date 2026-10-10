@@ -1,7 +1,8 @@
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+
 import '../../models/user.dart';
-import 'package:inspecampo/repositories/auth_repository.dart';
+import '../../repositories/auth_repository.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
