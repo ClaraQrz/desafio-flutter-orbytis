@@ -17,13 +17,18 @@ const kGeofenceRadiusMeters = 50.0;
 const _routeRefreshMeters = 50.0;
 
 class LocationBloc extends Bloc<LocationEvent, LocationState> {
-  LocationBloc({
+    LocationBloc({
     required RouteService routeService,
     this.targetLatitude,
     this.targetLongitude,
     this.radiusMeters = kGeofenceRadiusMeters,
+    double? initialLatitude,
+    double? initialLongitude,
   })  : _routeService = routeService,
-        super(const LocationState()) {
+        super(LocationState(
+          latitude: initialLatitude,
+          longitude: initialLongitude,
+        )) {
     on<LocationRequested>(_onRequested);
     on<LocationUpdated>(_onUpdated);
     on<LocationFailed>(_onFailed);

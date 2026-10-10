@@ -1,181 +1,216 @@
-import 'dart:async';
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../blocs/history/history_bloc.dart';
 import '../data/database.dart';
+import '../repositories/inspection_repository.dart';
+import '../repositories/work_orders_repository.dart';
+import '../router/app_router.dart';
 import '../services/connectivity_service.dart';
 import '../services/sync_service.dart';
 import '../theme/app_theme.dart';
-import 'package:auto_route/auto_route.dart';
-import '../repositories/inspection_repository.dart';
 
 @RoutePage()
-class HistoryScreen extends StatefulWidget {
+class HistoryScreen extends StatelessWidget implements AutoRouteWrapper {
   const HistoryScreen({super.key});
 
   @override
-  State<HistoryScreen> createState() => _HistoryScreenState();
-}
-
-class _HistoryScreenState extends State<HistoryScreen> {
-  final _repo = InspectionRepository(database: appDatabase);
-  late final SyncService _syncService;
-
-  List<Inspection> _all = [];
-  String _filter = 'all';
-  bool _isSyncing = false;
-
-  StreamSubscription<bool>? _connectivitySub;
-
-  @override
-  void initState() {
-    super.initState();
-    _syncService = SyncService(_repo);
-    _loadInspections();
-    _listenToConnectivity();
+  Widget wrappedRoute(BuildContext context) {
+    return BlocProvider(
+      create: (context) => HistoryBloc(
+        repository: context.read<InspectionRepository>(),
+        syncService: context.read<SyncService>(),
+        connectivity: context.read<ConnectivityService>(),
+      )..add(const HistoryEvent.loadRequested()),
+      child: this,
+    );
   }
 
-  @override
-  void dispose() {
-    _connectivitySub?.cancel();
-    super.dispose();
-  }
-
-  Future<void> _loadInspections() async {
-    final list = await _repo.getAll();
-    if (mounted) setState(() => _all = list);
-  }
-
-  void _listenToConnectivity() {
-    _connectivitySub = context.read<ConnectivityService>().onChanged.listen((
-      isOnline,
-    ) {
-      if (isOnline) _runSync(silent: true);
-    });
-  }
-
-  Future<void> _runSync({bool silent = false}) async {
-    if (_isSyncing) return;
-    setState(() => _isSyncing = true);
-    final count = await _syncService.syncAll();
-    await _loadInspections();
-    if (mounted) {
-      setState(() => _isSyncing = false);
-      if (!silent) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              count > 0
-                  ? '$count inspeção(ões) sincronizada(s).'
-                  : 'Nada novo para sincronizar.',
-              style: TextStyle(
-                fontFamily: 'Urbanist',
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+  void _showSnack(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: const TextStyle(
+            fontFamily: 'Urbanist',
+            fontWeight: FontWeight.w600,
           ),
-        );
-      }
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openInspection(
+    BuildContext context,
+    Inspection inspection,
+  ) async {
+    final readOnly = inspection.status != InspectionStatus.draft;
+
+    final workOrder = await context
+        .read<WorkOrdersRepository>()
+        .getCachedWorkOrder(inspection.workOrderId);
+    if (!context.mounted) return;
+
+    if (workOrder == null) {
+      _showSnack(
+        context,
+        'Não foi possível abrir: a OS ${inspection.workOrderId} '
+        'não está salva no aparelho.',
+      );
+      return;
+    }
+
+    await context.router.push(
+      InspectionFormRoute(
+        workOrder: workOrder,
+        draft: inspection,
+        readOnly: readOnly,
+      ),
+    );
+
+    if (context.mounted) {
+      context.read<HistoryBloc>().add(const HistoryEvent.loadRequested());
     }
   }
 
-  Future<void> _retry(Inspection inspection) async {
-    final success = await _syncService.syncOne(inspection);
-    await _loadInspections();
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            success
-                ? 'Sincronizado com sucesso.'
-                : 'Falha ao sincronizar. Será tentado novamente mais tarde.',
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<HistoryBloc, HistoryState>(
+      listenWhen: (_, current) => current.message != null,
+      listener: (context, state) => _showSnack(context, state.message!),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            'Histórico',
             style: TextStyle(
               fontFamily: 'Urbanist',
               fontWeight: FontWeight.w600,
             ),
           ),
+          actions: [
+            BlocBuilder<HistoryBloc, HistoryState>(
+              buildWhen: (prev, curr) => prev.isSyncing != curr.isSyncing,
+              builder: (context, state) => IconButton(
+                icon: state.isSyncing
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Icon(Icons.sync),
+                onPressed: state.isSyncing
+                    ? null
+                    : () => context.read<HistoryBloc>().add(
+                        const HistoryEvent.syncRequested(),
+                      ),
+              ),
+            ),
+          ],
         ),
-      );
-    }
-  }
-
-  List<Inspection> get _filtered {
-    if (_filter == 'all') return _all;
-    return _all.where((i) => i.status == _filter).toList();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Histórico', style: TextStyle(fontFamily: 'Urbanist', fontWeight: FontWeight.w600),),
-        actions: [
-          IconButton(
-            icon: _isSyncing
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  )
-                : const Icon(Icons.sync),
-            onPressed: _isSyncing ? null : () => _runSync(),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          _buildFilterChips(),
-          Expanded(
-            child: _filtered.isEmpty
-                ? const Center(child: Text('Nenhuma inspeção neste filtro.', style: TextStyle(fontFamily: 'Urbanist', fontWeight: FontWeight.w500, color: Colors.white),))
-                : RefreshIndicator(
-                    onRefresh: _loadInspections,
-                    child: ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: _filtered.length,
-                      itemBuilder: (context, index) {
-                        final inspection = _filtered[index];
-                        return _InspectionCard(
-                          inspection: inspection,
-                          onRetry: inspection.status == 'failed'
-                              ? () => _retry(inspection)
-                              : null,
-                        );
-                      },
-                    ),
-                  ),
-          ),
-        ],
+        body: Column(
+          children: [
+            const _FilterChips(),
+            Expanded(
+              child: _InspectionList(
+                onOpen: (inspection) => _openInspection(context, inspection),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
+}
 
-  Widget _buildFilterChips() {
-    final options = {
-      'all': 'Todos',
-      'draft': 'Rascunho',
-      'pending': 'Pendente',
-      'synced': 'Sincronizado',
-      'failed': 'Falhou',
-    };
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: options.entries.map((entry) {
-          final selected = _filter == entry.key;
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: ChoiceChip(
-              label: Text(entry.value),
-              selected: selected,
-              onSelected: (_) => setState(() => _filter = entry.key),
+class _FilterChips extends StatelessWidget {
+  const _FilterChips();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<HistoryBloc, HistoryState>(
+      buildWhen: (prev, curr) => prev.filter != curr.filter,
+      builder: (context, state) {
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            children: HistoryFilter.values.map((filter) {
+              return Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: ChoiceChip(
+                  label: Text(filter.label),
+                  selected: state.filter == filter,
+                  onSelected: (_) => context.read<HistoryBloc>().add(
+                    HistoryEvent.filterChanged(filter),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _InspectionList extends StatelessWidget {
+  const _InspectionList({required this.onOpen});
+
+  final void Function(Inspection inspection) onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<HistoryBloc, HistoryState>(
+      buildWhen: (prev, curr) =>
+          prev.isLoading != curr.isLoading ||
+          prev.inspections != curr.inspections ||
+          prev.filter != curr.filter,
+      builder: (context, state) {
+        if (state.isLoading) {
+          return const Center(
+            child: CircularProgressIndicator(color: Colors.white),
+          );
+        }
+
+        final items = state.filtered;
+        if (items.isEmpty) {
+          return const Center(
+            child: Text(
+              'Nenhuma inspeção neste filtro.',
+              style: TextStyle(
+                fontFamily: 'Urbanist',
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+              ),
             ),
           );
-        }).toList(),
-      ),
+        }
+
+        return RefreshIndicator(
+          onRefresh: () => context.read<HistoryBloc>().reload(),
+          child: ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(16),
+            itemCount: items.length,
+            itemBuilder: (context, index) {
+              final inspection = items[index];
+              return _InspectionCard(
+                inspection: inspection,
+                onTap: () => onOpen(inspection),
+                onRetry: inspection.status == InspectionStatus.failed
+                    ? () => context.read<HistoryBloc>().add(
+                        HistoryEvent.retryRequested(inspection),
+                      )
+                    : null,
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }
@@ -183,73 +218,106 @@ class _HistoryScreenState extends State<HistoryScreen> {
 class _InspectionCard extends StatelessWidget {
   final Inspection inspection;
   final VoidCallback? onRetry;
+  final VoidCallback onTap;
 
-  const _InspectionCard({required this.inspection, this.onRetry});
+  const _InspectionCard({
+    required this.inspection,
+    required this.onTap,
+    this.onRetry,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final isDraft = inspection.status == InspectionStatus.draft;
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'OS #${inspection.workOrderId}',
-                    style: const TextStyle(fontFamily: 'Urbanist', fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Data/hora: ${_formatDate(inspection.capturedAt)}',
-                    style: TextStyle(fontFamily: 'Urbanist',color: Colors.grey[600], fontSize: 12),
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: colorForSyncStatus(
-                        inspection.status,
-                      ).withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      labelForSyncStatus(inspection.status),
-                      style: TextStyle(
-                        fontFamily: 'Urbanist',
-                        color: colorForSyncStatus(inspection.status),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ),
-                  if (inspection.status == 'failed' &&
-                      inspection.errorMessage != null) ...[
-                    const SizedBox(height: 6),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Text(
-                      inspection.errorMessage!,
+                      'OS #${inspection.workOrderId}',
                       style: const TextStyle(
                         fontFamily: 'Urbanist',
-                        color: AppColors.failed,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Data/hora: ${_formatDate(inspection.capturedAt)}',
+                      style: TextStyle(
+                        fontFamily: 'Urbanist',
+                        color: Colors.grey[600],
                         fontSize: 12,
                       ),
                     ),
+                    if (inspection.createdBy != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        'Técnico: ${inspection.createdBy}',
+                        style: TextStyle(
+                          fontFamily: 'Urbanist',
+                          color: Colors.grey[600],
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colorForSyncStatus(
+                          inspection.status,
+                        ).withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        labelForSyncStatus(inspection.status),
+                        style: TextStyle(
+                          fontFamily: 'Urbanist',
+                          color: colorForSyncStatus(inspection.status),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ),
+                    if (inspection.status == InspectionStatus.failed &&
+                        inspection.errorMessage != null) ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        inspection.errorMessage!,
+                        style: const TextStyle(
+                          fontFamily: 'Urbanist',
+                          color: AppColors.failed,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
-            ),
-            if (onRetry != null)
-              TextButton(
-                onPressed: onRetry,
-                child: const Text('Tentar novamente'),
+              if (onRetry != null)
+                TextButton(
+                  onPressed: onRetry,
+                  child: const Text('Tentar novamente'),
+                ),
+              Icon(
+                isDraft ? Icons.edit_outlined : Icons.chevron_right,
+                color: Colors.black45,
               ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -259,6 +327,7 @@ class _InspectionCard extends StatelessWidget {
     final local = date.toLocal();
     return '${local.day.toString().padLeft(2, '0')}/'
         '${local.month.toString().padLeft(2, '0')}/${local.year} '
-        '${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';
+        '${local.hour.toString().padLeft(2, '0')}:'
+        '${local.minute.toString().padLeft(2, '0')}';
   }
 }

@@ -7,6 +7,8 @@ import '../models/work_order.dart';
 import '../repositories/work_orders_repository.dart';
 import '../router/app_router.dart';
 import '../theme/app_theme.dart';
+import '../data/database.dart';
+import '../repositories/inspection_repository.dart';
 
 IconData _iconForWorkOrderStatus(String status) => switch (status) {
   'done' => Icons.check_circle,
@@ -42,6 +44,18 @@ class WorkOrdersScreen extends StatelessWidget implements AutoRouteWrapper {
 
   void _sessionExpired(BuildContext context) {
     context.read<AuthBloc>().add(.sessionExpired());
+  }
+
+  Future<void> _openWorkOrder(BuildContext context, WorkOrder workOrder) async {
+    final draft = await InspectionRepository(
+      database: appDatabase,
+    ).getDraftFor(workOrder.id);
+    if (!context.mounted) return;
+
+    await context.router.push(
+      InspectionFormRoute(workOrder: workOrder, draft: draft),
+    );
+    if (context.mounted) _refresh(context);
   }
 
   @override
@@ -149,9 +163,7 @@ class WorkOrdersScreen extends StatelessWidget implements AutoRouteWrapper {
                               final workOrder = workOrders[index];
                               return _WorkOrderCard(
                                 workOrder: workOrder,
-                                onTap: () => context.router.push(
-                                  InspectionFormRoute(workOrder: workOrder),
-                                ),
+                                onTap: () => _openWorkOrder(context, workOrder),
                               );
                             },
                           ),
@@ -182,8 +194,11 @@ class WorkOrdersScreen extends StatelessWidget implements AutoRouteWrapper {
           ),
           child: NavigationBar(
             selectedIndex: 0,
-            onDestinationSelected: (i) {
-              if (i == 1) context.router.push(const HistoryRoute());
+                        onDestinationSelected: (i) async {
+              if (i == 1) {
+                await context.router.push(const HistoryRoute());
+                if (context.mounted) _refresh(context);
+              }
               if (i == 2) _logout(context);
             },
             destinations: const [

@@ -1,6 +1,7 @@
-import 'package:drift/drift.dart' show Value;
+import 'package:drift/drift.dart';
 import 'package:inspecampo/data/database.dart';
 import 'package:inspecampo/models/work_order.dart';
+import 'package:inspecampo/repositories/inspection_repository.dart';
 import 'package:inspecampo/services/connectivity_service.dart';
 import 'package:inspecampo/services/work_orders_service.dart';
 
@@ -9,7 +10,7 @@ class WorkOrdersRepository {
     required WorkOrdersService workOrdersService,
     required AppDatabase database,
     required ConnectivityService connectivity,
-  }) : _service = workOrdersService,
+  })  : _service = workOrdersService,
         _db = database,
         _connectivity = connectivity;
 
@@ -18,9 +19,9 @@ class WorkOrdersRepository {
   final ConnectivityService _connectivity;
 
   Future<List<WorkOrder>> getWorkOrders() async {
-    if (!await _connectivity.isOnline) {
+    if (!await _connectivity.isOnline()) {
       final cached = await _readCache();
-      if (cached.isNotEmpty) return cached;
+      if (cached.isNotEmpty) return _onlyAvailable(cached);
       throw WorkOrdersException(
         'Sem conexão e nenhuma ordem de serviço salva no aparelho.',
       );
@@ -29,37 +30,71 @@ class WorkOrdersRepository {
     try {
       final orders = await _service.getWorkOrders();
       await _saveCache(orders);
-      return orders;
+      return _onlyAvailable(orders);
     } on WorkOrdersException catch (e) {
       if (e.isSessionExpired) rethrow;
 
       final cached = await _readCache();
-      if (cached.isNotEmpty) return cached;
+      if (cached.isNotEmpty) return _onlyAvailable(cached);
       rethrow;
     }
   }
+  
+  Future<WorkOrder?> getCachedWorkOrder(String id) async {
+    final cached = await _readCache();
+    for (final o in cached) {
+      if (o.id == id) return o;
+    }
+    return null;
+  }
+
+  Future<Set<String>> _inspectedWorkOrderIds() async {
+    final rows = await _db.select(_db.inspections).get();
+    return {
+      for (final r in rows)
+        if (r.status != InspectionStatus.draft) r.workOrderId,
+    };
+  }
+
+  Future<Set<String>> _workOrderIdsWithInspections() async {
+    final rows = await _db.select(_db.inspections).get();
+    return {for (final r in rows) r.workOrderId};
+  }
+
+  Future<List<WorkOrder>> _onlyAvailable(List<WorkOrder> orders) async {
+    final inspected = await _inspectedWorkOrderIds();
+    return orders
+        .where((o) => o.status != 'done' && !inspected.contains(o.id))
+        .toList();
+  }
 
   Future<void> _saveCache(List<WorkOrder> orders) async {
+    final keepIds = (await _workOrderIdsWithInspections()).toList();
+
     await _db.transaction(() async {
-      await _db.delete(_db.cachedWorkOrders).go();
+      await (_db.delete(_db.cachedWorkOrders)
+            ..where((t) => t.id.isNotIn(keepIds)))
+          .go();
+
       await _db.batch((batch) {
         batch.insertAll(
           _db.cachedWorkOrders,
           orders
               .map(
                 (o) => CachedWorkOrdersCompanion.insert(
-              id: o.id,
-              code: o.code,
-              title: o.title,
-              description: o.description,
-              address: o.address,
-              priority: o.priority,
-              status: o.status,
-              latitude: Value(o.latitude),
-              longitude: Value(o.longitude),
-            ),
-          )
+                  id: o.id,
+                  code: o.code,
+                  title: o.title,
+                  description: o.description,
+                  address: o.address,
+                  priority: o.priority,
+                  status: o.status,
+                  latitude: Value(o.latitude),
+                  longitude: Value(o.longitude),
+                ),
+              )
               .toList(),
+          mode: InsertMode.insertOrReplace,
         );
       });
     });
@@ -70,17 +105,17 @@ class WorkOrdersRepository {
     return rows
         .map(
           (r) => WorkOrder(
-        id: r.id,
-        code: r.code,
-        title: r.title,
-        description: r.description,
-        address: r.address,
-        priority: r.priority,
-        status: r.status,
-        latitude: r.latitude,
-        longitude: r.longitude,
-      ),
-    )
+            id: r.id,
+            code: r.code,
+            title: r.title,
+            description: r.description,
+            address: r.address,
+            priority: r.priority,
+            status: r.status,
+            latitude: r.latitude,
+            longitude: r.longitude,
+          ),
+        )
         .toList();
   }
 }

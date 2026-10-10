@@ -22,7 +22,8 @@ class LocationMapCard extends StatefulWidget {
     this.isManual = false,
     this.error,
     this.onConfirm,
-    this.onLocationChanged,
+    this.onExpand,
+    this.fillHeight = false,
   });
 
   final bool isLoading;
@@ -50,8 +51,9 @@ class LocationMapCard extends StatefulWidget {
 
   final VoidCallback? onConfirm;
 
+  final VoidCallback? onExpand;
 
-  final void Function(double latitude, double longitude)? onLocationChanged;
+  final bool fillHeight;
 
   @override
   State<LocationMapCard> createState() => _LocationMapCardState();
@@ -70,9 +72,9 @@ class _LocationMapCardState extends State<LocationMapCard> {
       _point(widget.confirmedLatitude, widget.confirmedLongitude);
   LatLng? get _target => _point(widget.targetLatitude, widget.targetLongitude);
 
-  bool get _hasMap =>
-      _current != null || _confirmed != null || _target != null;
+  bool get _hasMap => _current != null || _confirmed != null || _target != null;
 
+  bool get _locked => _confirmed != null;
 
   List<LatLng> _focusPoints() {
     final current = _current;
@@ -87,10 +89,10 @@ class _LocationMapCardState extends State<LocationMapCard> {
   }
 
   CameraFit _cameraFit(List<LatLng> points) => CameraFit.bounds(
-        bounds: LatLngBounds.fromPoints(points),
-        padding: const EdgeInsets.all(48),
-        maxZoom: 18,
-      );
+    bounds: LatLngBounds.fromPoints(points),
+    padding: const EdgeInsets.all(48),
+    maxZoom: 18,
+  );
 
   void _fit() {
     final points = _focusPoints();
@@ -108,7 +110,7 @@ class _LocationMapCardState extends State<LocationMapCard> {
     final firstFix =
         oldWidget.currentLatitude == null && widget.currentLatitude != null;
     final routeArrived = oldWidget.route.isEmpty && widget.route.isNotEmpty;
-    if (firstFix || routeArrived) _fit();
+    if (!_locked && (firstFix || routeArrived)) _fit();
   }
 
   @override
@@ -119,16 +121,18 @@ class _LocationMapCardState extends State<LocationMapCard> {
 
   @override
   Widget build(BuildContext context) {
+    final map = ClipRRect(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+      child: _hasMap ? _buildMap() : _buildPlaceholder(),
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-          child: SizedBox(
-            height: 220,
-            child: _hasMap ? _buildMap() : _buildPlaceholder(),
-          ),
-        ),
+        if (widget.fillHeight)
+          Expanded(child: map)
+        else
+          SizedBox(height: 220, child: map),
         _buildStatusBar(),
       ],
     );
@@ -149,14 +153,16 @@ class _LocationMapCardState extends State<LocationMapCard> {
             initialZoom: 17,
             initialCameraFit: points.length > 1 ? _cameraFit(points) : null,
             onMapReady: () => _mapReady = true,
-            interactionOptions: const InteractionOptions(
-              flags: InteractiveFlag.pinchZoom |
-                  InteractiveFlag.drag |
-                  InteractiveFlag.doubleTapZoom,
+            interactionOptions: InteractionOptions(
+              flags: _locked
+                  ? InteractiveFlag.none
+                  : InteractiveFlag.pinchZoom |
+                        InteractiveFlag.drag |
+                        InteractiveFlag.doubleTapZoom,
             ),
-            onTap: (_, point) {
-              if (widget.isLoading) return;
-              widget.onLocationChanged?.call(point.latitude, point.longitude);
+            onTap: (_, _) {
+              if (_locked || widget.isLoading) return;
+              widget.onExpand?.call();
             },
           ),
           children: [
@@ -199,8 +205,11 @@ class _LocationMapCardState extends State<LocationMapCard> {
                     width: 40,
                     height: 40,
                     alignment: Alignment.topCenter,
-                    child: const Icon(Icons.location_on,
-                        size: 40, color: Colors.red),
+                    child: const Icon(
+                      Icons.location_on,
+                      size: 40,
+                      color: Colors.red,
+                    ),
                   ),
                 if (current != null)
                   Marker(
@@ -223,8 +232,11 @@ class _LocationMapCardState extends State<LocationMapCard> {
                     point: confirmed,
                     width: 32,
                     height: 32,
-                    child: const Icon(Icons.check_circle,
-                        size: 32, color: AppColors.synced),
+                    child: const Icon(
+                      Icons.check_circle,
+                      size: 32,
+                      color: AppColors.synced,
+                    ),
                   ),
               ],
             ),
@@ -233,7 +245,7 @@ class _LocationMapCardState extends State<LocationMapCard> {
             ),
           ],
         ),
-        if (widget.onLocationChanged != null)
+        if (widget.onExpand != null && !_locked)
           Positioned(
             top: 8,
             left: 8,
@@ -244,25 +256,26 @@ class _LocationMapCardState extends State<LocationMapCard> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Text(
-                'Toque no mapa para ajustar',
+                'Toque para ampliar',
                 style: TextStyle(fontSize: 11),
               ),
             ),
           ),
-        Positioned(
-          top: 8,
-          right: 8,
-          child: Material(
-            color: Colors.white,
-            shape: const CircleBorder(),
-            elevation: 2,
-            child: IconButton(
-              tooltip: 'Centralizar mapa',
-              onPressed: _fit,
-              icon: const Icon(Icons.my_location, color: AppColors.primary),
+        if (!_locked)
+          Positioned(
+            top: 8,
+            right: 8,
+            child: Material(
+              color: Colors.white,
+              shape: const CircleBorder(),
+              elevation: 2,
+              child: IconButton(
+                tooltip: 'Centralizar mapa',
+                onPressed: _fit,
+                icon: const Icon(Icons.my_location, color: AppColors.primary),
+              ),
             ),
           ),
-        ),
       ],
     );
   }
@@ -319,7 +332,8 @@ class _LocationMapCardState extends State<LocationMapCard> {
       title = widget.isManual
           ? 'Localização ajustada manualmente'
           : 'Localização confirmada';
-      subtitle = '${widget.confirmedLatitude!.toStringAsFixed(4)}, '
+      subtitle =
+          '${widget.confirmedLatitude!.toStringAsFixed(4)}, '
           '${widget.confirmedLongitude!.toStringAsFixed(4)}';
     } else if (!hasCurrent && widget.isLoading) {
       color = AppColors.draft;
@@ -347,7 +361,8 @@ class _LocationMapCardState extends State<LocationMapCard> {
       title = 'Confirme sua localização para concluir';
     }
 
-    final canConfirm = hasCurrent &&
+    final canConfirm =
+        hasCurrent &&
         widget.isInRange &&
         !confirmed &&
         widget.onConfirm != null;

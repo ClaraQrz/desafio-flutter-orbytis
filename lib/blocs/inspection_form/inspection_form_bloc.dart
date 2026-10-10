@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
+import '../../data/database.dart';
 import '../../repositories/inspection_repository.dart';
 
 part 'inspection_form_event.dart';
@@ -14,8 +15,12 @@ part 'inspection_form_bloc.freezed.dart';
 
 class InspectionFormBloc
     extends Bloc<InspectionFormEvent, InspectionFormState> {
-  InspectionFormBloc(this._repo, {required this.workOrderId})
-      : super(const InspectionFormState()) {
+  InspectionFormBloc(
+    this._repo, {
+    required this.workOrderId,
+    Inspection? draft,
+  })  : _draft = draft,
+        super(InspectionFormState(photoPath: draft?.photoPath)) {
     on<PhotoSourceSelected>(_onPhotoSelected);
     on<PhotoRemoved>(_onPhotoRemoved);
     on<DraftSubmitted>(_onDraftSubmitted);
@@ -24,6 +29,8 @@ class InspectionFormBloc
 
   final InspectionRepository _repo;
   final String workOrderId;
+
+  final Inspection? _draft;
 
   void _notify(
     Emitter<InspectionFormState> emit,
@@ -87,16 +94,27 @@ class InspectionFormBloc
 
     emit(state.copyWith(status: InspectionFormStatus.submitting));
     try {
-      await _repo.createDraft(
-        workOrderId: workOrderId,
-        observation: observation,
-        photoPath: state.photoPath,
-        latitude: event.latitude,
-        longitude: event.longitude,
-      );
+      final draft = _draft;
+      if (draft == null) {
+        await _repo.createDraft(
+          workOrderId: workOrderId,
+          observation: observation,
+          photoPath: state.photoPath,
+          latitude: event.latitude,
+          longitude: event.longitude,
+        );
+      } else {
+        await _repo.updateDraft(
+          id: draft.id,
+          observation: observation,
+          photoPath: state.photoPath,
+          latitude: event.latitude,
+          longitude: event.longitude,
+        );
+      }
       _notify(
         emit,
-        'Rascunho salvo localmente.',
+        draft == null ? 'Rascunho salvo localmente.' : 'Rascunho atualizado.',
         status: InspectionFormStatus.success,
       );
     } catch (_) {
@@ -126,13 +144,24 @@ class InspectionFormBloc
 
     emit(state.copyWith(status: InspectionFormStatus.submitting));
     try {
-      await _repo.createPending(
-        workOrderId: workOrderId,
-        observation: observation,
-        photoPath: state.photoPath!,
-        latitude: event.latitude!,
-        longitude: event.longitude!,
-      );
+      final draft = _draft;
+      if (draft == null) {
+        await _repo.createPending(
+          workOrderId: workOrderId,
+          observation: observation,
+          photoPath: state.photoPath!,
+          latitude: event.latitude!,
+          longitude: event.longitude!,
+        );
+      } else {
+        await _repo.concludeDraft(
+          id: draft.id,
+          observation: observation,
+          photoPath: state.photoPath!,
+          latitude: event.latitude!,
+          longitude: event.longitude!,
+        );
+      }
       _notify(
         emit,
         'Inspeção concluída, adicionada à fila de sincronização.',

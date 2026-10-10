@@ -11,9 +11,13 @@ abstract final class InspectionStatus {
 }
 
 class InspectionRepository {
-  InspectionRepository({required AppDatabase database}) : _db = database;
+  InspectionRepository({required AppDatabase database, this.createdBy})
+    : _db = database;
 
   final AppDatabase _db;
+
+  final String? createdBy;
+
   static const _uuid = Uuid();
 
   Future<String> createDraft({
@@ -52,19 +56,31 @@ class InspectionRepository {
 
   Future<List<Inspection>> getAll() {
     return (_db.select(_db.inspections)
-      ..orderBy([(t) => OrderingTerm.desc(t.capturedAt)]))
+          ..orderBy([(t) => OrderingTerm.desc(t.capturedAt)]))
         .get();
+  }
+
+  Future<Inspection?> getDraftFor(String workOrderId) {
+    return (_db.select(_db.inspections)
+          ..where(
+            (t) =>
+                t.workOrderId.equals(workOrderId) &
+                t.status.equals(InspectionStatus.draft),
+          )
+          ..orderBy([(t) => OrderingTerm.desc(t.capturedAt)])
+          ..limit(1))
+        .getSingleOrNull();
   }
 
   Future<List<Inspection>> getPendingOrFailed() {
     return (_db.select(_db.inspections)
-      ..where(
+          ..where(
             (t) => t.status.isIn([
-          InspectionStatus.pending,
-          InspectionStatus.failed,
-        ]),
-      )
-      ..orderBy([(t) => OrderingTerm.asc(t.capturedAt)]))
+              InspectionStatus.pending,
+              InspectionStatus.failed,
+            ]),
+          )
+          ..orderBy([(t) => OrderingTerm.asc(t.capturedAt)]))
         .get();
   }
 
@@ -87,6 +103,42 @@ class InspectionRepository {
     );
   }
 
+  Future<void> updateDraft({
+    required int id,
+    required String observation,
+    String? photoPath,
+    double? latitude,
+    double? longitude,
+  }) {
+    return (_db.update(_db.inspections)..where((t) => t.id.equals(id))).write(
+      InspectionsCompanion(
+        observation: Value(observation),
+        photoPath: Value(photoPath),
+        latitude: Value(latitude),
+        longitude: Value(longitude),
+      ),
+    );
+  }
+
+  Future<void> concludeDraft({
+    required int id,
+    required String observation,
+    required String photoPath,
+    required double latitude,
+    required double longitude,
+  }) {
+    return (_db.update(_db.inspections)..where((t) => t.id.equals(id))).write(
+      InspectionsCompanion(
+        status: const Value(InspectionStatus.pending),
+        observation: Value(observation),
+        photoPath: Value(photoPath),
+        latitude: Value(latitude),
+        longitude: Value(longitude),
+        errorMessage: const Value(null),
+      ),
+    );
+  }
+
   Future<String> _insert({
     required String status,
     required String workOrderId,
@@ -96,18 +148,21 @@ class InspectionRepository {
     double? longitude,
   }) async {
     final clientId = _uuid.v4();
-    await _db.into(_db.inspections).insert(
-      InspectionsCompanion.insert(
-        clientId: clientId,
-        workOrderId: workOrderId,
-        observation: observation,
-        capturedAt: DateTime.now(),
-        status: Value(status),
-        photoPath: Value(photoPath),
-        latitude: Value(latitude),
-        longitude: Value(longitude),
-      ),
-    );
+    await _db
+        .into(_db.inspections)
+        .insert(
+          InspectionsCompanion.insert(
+            clientId: clientId,
+            workOrderId: workOrderId,
+            observation: observation,
+            capturedAt: DateTime.now(),
+            status: Value(status),
+            photoPath: Value(photoPath),
+            latitude: Value(latitude),
+            longitude: Value(longitude),
+            createdBy: Value(createdBy),
+          ),
+        );
     return clientId;
   }
 }

@@ -21,7 +21,7 @@ class HistoryRoute extends PageRouteInfo<void> {
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return const HistoryScreen();
+      return WrappedRoute(child: const HistoryScreen());
     },
   );
 }
@@ -32,10 +32,17 @@ class InspectionFormRoute extends PageRouteInfo<InspectionFormRouteArgs> {
   InspectionFormRoute({
     Key? key,
     required WorkOrder workOrder,
+    Inspection? draft,
+    bool readOnly = false,
     List<PageRouteInfo>? children,
   }) : super(
          InspectionFormRoute.name,
-         args: InspectionFormRouteArgs(key: key, workOrder: workOrder),
+         args: InspectionFormRouteArgs(
+           key: key,
+           workOrder: workOrder,
+           draft: draft,
+           readOnly: readOnly,
+         ),
          initialChildren: children,
        );
 
@@ -46,33 +53,51 @@ class InspectionFormRoute extends PageRouteInfo<InspectionFormRouteArgs> {
     builder: (data) {
       final args = data.argsAs<InspectionFormRouteArgs>();
       return WrappedRoute(
-        child: InspectionFormScreen(key: args.key, workOrder: args.workOrder),
+        child: InspectionFormScreen(
+          key: args.key,
+          workOrder: args.workOrder,
+          draft: args.draft,
+          readOnly: args.readOnly,
+        ),
       );
     },
   );
 }
 
 class InspectionFormRouteArgs {
-  const InspectionFormRouteArgs({this.key, required this.workOrder});
+  const InspectionFormRouteArgs({
+    this.key,
+    required this.workOrder,
+    this.draft,
+    this.readOnly = false,
+  });
 
   final Key? key;
 
   final WorkOrder workOrder;
 
+  final Inspection? draft;
+
+  final bool readOnly;
+
   @override
   String toString() {
-    return 'InspectionFormRouteArgs{key: $key, workOrder: $workOrder}';
+    return 'InspectionFormRouteArgs{key: $key, workOrder: $workOrder, draft: $draft, readOnly: $readOnly}';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! InspectionFormRouteArgs) return false;
-    return key == other.key && workOrder == other.workOrder;
+    return key == other.key &&
+        workOrder == other.workOrder &&
+        draft == other.draft &&
+        readOnly == other.readOnly;
   }
 
   @override
-  int get hashCode => key.hashCode ^ workOrder.hashCode;
+  int get hashCode =>
+      key.hashCode ^ workOrder.hashCode ^ draft.hashCode ^ readOnly.hashCode;
 }
 
 /// generated route for

@@ -143,6 +143,17 @@ class $InspectionsTable extends Inspections
     type: DriftSqlType.dateTime,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _createdByMeta = const VerificationMeta(
+    'createdBy',
+  );
+  @override
+  late final GeneratedColumn<String> createdBy = GeneratedColumn<String>(
+    'created_by',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -157,6 +168,7 @@ class $InspectionsTable extends Inspections
     status,
     errorMessage,
     syncedAt,
+    createdBy,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -256,6 +268,12 @@ class $InspectionsTable extends Inspections
         syncedAt.isAcceptableOrUnknown(data['synced_at']!, _syncedAtMeta),
       );
     }
+    if (data.containsKey('created_by')) {
+      context.handle(
+        _createdByMeta,
+        createdBy.isAcceptableOrUnknown(data['created_by']!, _createdByMeta),
+      );
+    }
     return context;
   }
 
@@ -313,6 +331,10 @@ class $InspectionsTable extends Inspections
         DriftSqlType.dateTime,
         data['${effectivePrefix}synced_at'],
       ),
+      createdBy: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}created_by'],
+      ),
     );
   }
 
@@ -335,6 +357,7 @@ class Inspection extends DataClass implements Insertable<Inspection> {
   final String status;
   final String? errorMessage;
   final DateTime? syncedAt;
+  final String? createdBy;
   const Inspection({
     required this.id,
     required this.clientId,
@@ -348,6 +371,7 @@ class Inspection extends DataClass implements Insertable<Inspection> {
     required this.status,
     this.errorMessage,
     this.syncedAt,
+    this.createdBy,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -375,6 +399,9 @@ class Inspection extends DataClass implements Insertable<Inspection> {
     }
     if (!nullToAbsent || syncedAt != null) {
       map['synced_at'] = Variable<DateTime>(syncedAt);
+    }
+    if (!nullToAbsent || createdBy != null) {
+      map['created_by'] = Variable<String>(createdBy);
     }
     return map;
   }
@@ -405,6 +432,9 @@ class Inspection extends DataClass implements Insertable<Inspection> {
       syncedAt: syncedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(syncedAt),
+      createdBy: createdBy == null && nullToAbsent
+          ? const Value.absent()
+          : Value(createdBy),
     );
   }
 
@@ -426,6 +456,7 @@ class Inspection extends DataClass implements Insertable<Inspection> {
       status: serializer.fromJson<String>(json['status']),
       errorMessage: serializer.fromJson<String?>(json['errorMessage']),
       syncedAt: serializer.fromJson<DateTime?>(json['syncedAt']),
+      createdBy: serializer.fromJson<String?>(json['createdBy']),
     );
   }
   @override
@@ -444,6 +475,7 @@ class Inspection extends DataClass implements Insertable<Inspection> {
       'status': serializer.toJson<String>(status),
       'errorMessage': serializer.toJson<String?>(errorMessage),
       'syncedAt': serializer.toJson<DateTime?>(syncedAt),
+      'createdBy': serializer.toJson<String?>(createdBy),
     };
   }
 
@@ -460,6 +492,7 @@ class Inspection extends DataClass implements Insertable<Inspection> {
     String? status,
     Value<String?> errorMessage = const Value.absent(),
     Value<DateTime?> syncedAt = const Value.absent(),
+    Value<String?> createdBy = const Value.absent(),
   }) => Inspection(
     id: id ?? this.id,
     clientId: clientId ?? this.clientId,
@@ -473,6 +506,7 @@ class Inspection extends DataClass implements Insertable<Inspection> {
     status: status ?? this.status,
     errorMessage: errorMessage.present ? errorMessage.value : this.errorMessage,
     syncedAt: syncedAt.present ? syncedAt.value : this.syncedAt,
+    createdBy: createdBy.present ? createdBy.value : this.createdBy,
   );
   Inspection copyWithCompanion(InspectionsCompanion data) {
     return Inspection(
@@ -496,6 +530,7 @@ class Inspection extends DataClass implements Insertable<Inspection> {
           ? data.errorMessage.value
           : this.errorMessage,
       syncedAt: data.syncedAt.present ? data.syncedAt.value : this.syncedAt,
+      createdBy: data.createdBy.present ? data.createdBy.value : this.createdBy,
     );
   }
 
@@ -513,7 +548,8 @@ class Inspection extends DataClass implements Insertable<Inspection> {
           ..write('capturedAt: $capturedAt, ')
           ..write('status: $status, ')
           ..write('errorMessage: $errorMessage, ')
-          ..write('syncedAt: $syncedAt')
+          ..write('syncedAt: $syncedAt, ')
+          ..write('createdBy: $createdBy')
           ..write(')'))
         .toString();
   }
@@ -532,6 +568,7 @@ class Inspection extends DataClass implements Insertable<Inspection> {
     status,
     errorMessage,
     syncedAt,
+    createdBy,
   );
   @override
   bool operator ==(Object other) =>
@@ -548,7 +585,8 @@ class Inspection extends DataClass implements Insertable<Inspection> {
           other.capturedAt == this.capturedAt &&
           other.status == this.status &&
           other.errorMessage == this.errorMessage &&
-          other.syncedAt == this.syncedAt);
+          other.syncedAt == this.syncedAt &&
+          other.createdBy == this.createdBy);
 }
 
 class InspectionsCompanion extends UpdateCompanion<Inspection> {
@@ -564,6 +602,7 @@ class InspectionsCompanion extends UpdateCompanion<Inspection> {
   final Value<String> status;
   final Value<String?> errorMessage;
   final Value<DateTime?> syncedAt;
+  final Value<String?> createdBy;
   const InspectionsCompanion({
     this.id = const Value.absent(),
     this.clientId = const Value.absent(),
@@ -577,6 +616,7 @@ class InspectionsCompanion extends UpdateCompanion<Inspection> {
     this.status = const Value.absent(),
     this.errorMessage = const Value.absent(),
     this.syncedAt = const Value.absent(),
+    this.createdBy = const Value.absent(),
   });
   InspectionsCompanion.insert({
     this.id = const Value.absent(),
@@ -591,6 +631,7 @@ class InspectionsCompanion extends UpdateCompanion<Inspection> {
     this.status = const Value.absent(),
     this.errorMessage = const Value.absent(),
     this.syncedAt = const Value.absent(),
+    this.createdBy = const Value.absent(),
   }) : clientId = Value(clientId),
        workOrderId = Value(workOrderId),
        observation = Value(observation),
@@ -608,6 +649,7 @@ class InspectionsCompanion extends UpdateCompanion<Inspection> {
     Expression<String>? status,
     Expression<String>? errorMessage,
     Expression<DateTime>? syncedAt,
+    Expression<String>? createdBy,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -622,6 +664,7 @@ class InspectionsCompanion extends UpdateCompanion<Inspection> {
       if (status != null) 'status': status,
       if (errorMessage != null) 'error_message': errorMessage,
       if (syncedAt != null) 'synced_at': syncedAt,
+      if (createdBy != null) 'created_by': createdBy,
     });
   }
 
@@ -638,6 +681,7 @@ class InspectionsCompanion extends UpdateCompanion<Inspection> {
     Value<String>? status,
     Value<String?>? errorMessage,
     Value<DateTime?>? syncedAt,
+    Value<String?>? createdBy,
   }) {
     return InspectionsCompanion(
       id: id ?? this.id,
@@ -652,6 +696,7 @@ class InspectionsCompanion extends UpdateCompanion<Inspection> {
       status: status ?? this.status,
       errorMessage: errorMessage ?? this.errorMessage,
       syncedAt: syncedAt ?? this.syncedAt,
+      createdBy: createdBy ?? this.createdBy,
     );
   }
 
@@ -694,6 +739,9 @@ class InspectionsCompanion extends UpdateCompanion<Inspection> {
     if (syncedAt.present) {
       map['synced_at'] = Variable<DateTime>(syncedAt.value);
     }
+    if (createdBy.present) {
+      map['created_by'] = Variable<String>(createdBy.value);
+    }
     return map;
   }
 
@@ -711,7 +759,8 @@ class InspectionsCompanion extends UpdateCompanion<Inspection> {
           ..write('capturedAt: $capturedAt, ')
           ..write('status: $status, ')
           ..write('errorMessage: $errorMessage, ')
-          ..write('syncedAt: $syncedAt')
+          ..write('syncedAt: $syncedAt, ')
+          ..write('createdBy: $createdBy')
           ..write(')'))
         .toString();
   }
@@ -1309,6 +1358,7 @@ typedef $$InspectionsTableCreateCompanionBuilder =
       Value<String> status,
       Value<String?> errorMessage,
       Value<DateTime?> syncedAt,
+      Value<String?> createdBy,
     });
 typedef $$InspectionsTableUpdateCompanionBuilder =
     InspectionsCompanion Function({
@@ -1324,6 +1374,7 @@ typedef $$InspectionsTableUpdateCompanionBuilder =
       Value<String> status,
       Value<String?> errorMessage,
       Value<DateTime?> syncedAt,
+      Value<String?> createdBy,
     });
 
 class $$InspectionsTableFilterComposer
@@ -1392,6 +1443,11 @@ class $$InspectionsTableFilterComposer
 
   ColumnFilters<DateTime> get syncedAt => $composableBuilder(
     column: $table.syncedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get createdBy => $composableBuilder(
+    column: $table.createdBy,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -1464,6 +1520,11 @@ class $$InspectionsTableOrderingComposer
     column: $table.syncedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get createdBy => $composableBuilder(
+    column: $table.createdBy,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$InspectionsTableAnnotationComposer
@@ -1518,6 +1579,9 @@ class $$InspectionsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get syncedAt =>
       $composableBuilder(column: $table.syncedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get createdBy =>
+      $composableBuilder(column: $table.createdBy, builder: (column) => column);
 }
 
 class $$InspectionsTableTableManager
@@ -1563,6 +1627,7 @@ class $$InspectionsTableTableManager
                 Value<String> status = const Value.absent(),
                 Value<String?> errorMessage = const Value.absent(),
                 Value<DateTime?> syncedAt = const Value.absent(),
+                Value<String?> createdBy = const Value.absent(),
               }) => InspectionsCompanion(
                 id: id,
                 clientId: clientId,
@@ -1576,6 +1641,7 @@ class $$InspectionsTableTableManager
                 status: status,
                 errorMessage: errorMessage,
                 syncedAt: syncedAt,
+                createdBy: createdBy,
               ),
           createCompanionCallback:
               ({
@@ -1591,6 +1657,7 @@ class $$InspectionsTableTableManager
                 Value<String> status = const Value.absent(),
                 Value<String?> errorMessage = const Value.absent(),
                 Value<DateTime?> syncedAt = const Value.absent(),
+                Value<String?> createdBy = const Value.absent(),
               }) => InspectionsCompanion.insert(
                 id: id,
                 clientId: clientId,
@@ -1604,6 +1671,7 @@ class $$InspectionsTableTableManager
                 status: status,
                 errorMessage: errorMessage,
                 syncedAt: syncedAt,
+                createdBy: createdBy,
               ),
           withReferenceMapper: (p0) => p0
               .map(
