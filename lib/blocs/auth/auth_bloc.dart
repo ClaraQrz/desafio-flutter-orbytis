@@ -18,10 +18,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   final AuthRepository _repo;
 
-  Future<void> _onStarted(
-    AuthStarted event,
-    Emitter<AuthState> emit,
-  ) async {
+  Future<void> _onStarted(AuthStarted event, Emitter<AuthState> emit) async {
     final user = await _repo.getSession();
 
     if (user != null) {
@@ -31,10 +28,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  void _onLoggedIn(
-    AuthLoggedIn event,
-    Emitter<AuthState> emit,
-  ) {
+  void _onLoggedIn(AuthLoggedIn event, Emitter<AuthState> emit) {
     emit(AuthState.authenticated(event.user));
   }
 
@@ -42,17 +36,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthLogoutRequested event,
     Emitter<AuthState> emit,
   ) async {
-    await _repo.logout();
-
-    emit(const AuthState.unauthenticated());
+    await _clearSession(emit);
   }
 
   Future<void> _onSessionExpired(
     AuthSessionExpired event,
     Emitter<AuthState> emit,
   ) async {
-    await _repo.logout();
+    await _clearSession(emit);
+  }
 
+  Future<void> _clearSession(Emitter<AuthState> emit) async {
+    await _repo.logout();
     emit(const AuthState.unauthenticated());
   }
 }

@@ -9,6 +9,8 @@ import '../blocs/inspection_form/inspection_form_bloc.dart';
 import '../blocs/location/location_bloc.dart';
 import '../data/database.dart';
 import '../models/work_order.dart';
+import '../models/inspection_status.dart';
+import '../models/work_order_status.dart';
 import '../repositories/inspection_repository.dart';
 import '../router/app_router.dart';
 import '../services/photo_service.dart';
@@ -167,14 +169,14 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
   }
 
   (String, IconData, Color) _statusChip(String status) {
-    switch (status) {
-      case 'done':
-        return ('CONCLUÍDA', Icons.check_circle, AppColors.synced);
-      case 'in_progress':
-        return ('EM ANDAMENTO', Icons.timelapse, AppColors.primary);
-      default:
-        return ('PENDENTE', Icons.schedule, AppColors.primary);
-    }
+    final label = labelForWorkOrderStatus(status);
+
+    return switch (WorkOrderStatus.fromValue(status)) {
+      WorkOrderStatus.done => (label, Icons.check_circle, AppColors.synced),
+      WorkOrderStatus.inProgress => (label, Icons.timelapse, AppColors.primary),
+      WorkOrderStatus.open ||
+      null => (label, Icons.schedule, AppColors.primary),
+    };
   }
 
   String get _title {
@@ -440,12 +442,14 @@ String _formatDate(DateTime date) {
       '${local.minute.toString().padLeft(2, '0')}';
 }
 
-IconData _iconForSyncStatus(String status) => switch (status) {
-  'synced' => Icons.check_circle,
-  'pending' => Icons.schedule,
-  'failed' => Icons.error_outline,
-  _ => Icons.edit_outlined,
-};
+IconData _iconForSyncStatus(String status) {
+  return switch (InspectionStatus.fromValue(status)) {
+    InspectionStatus.synced => Icons.check_circle,
+    InspectionStatus.pending => Icons.schedule,
+    InspectionStatus.failed => Icons.error_outline,
+    InspectionStatus.draft || null => Icons.edit_outlined,
+  };
+}
 
 class _SectionLabel extends StatelessWidget {
   const _SectionLabel(this.text);
@@ -523,10 +527,13 @@ class _InspectionInfo extends StatelessWidget {
             icon: _iconForSyncStatus(inspection.status),
             color: color,
           ),
-          _InfoLine(label: 'Data/hora', value: _formatDate(inspection.capturedAt)),
+          _InfoLine(
+            label: 'Data/hora',
+            value: _formatDate(inspection.capturedAt),
+          ),
           if (inspection.createdBy != null)
             _InfoLine(label: 'Técnico', value: inspection.createdBy!),
-          if (inspection.status == 'failed' &&
+          if (inspection.status == InspectionStatus.failed.value &&
               inspection.errorMessage != null) ...[
             const SizedBox(height: 8),
             Text(

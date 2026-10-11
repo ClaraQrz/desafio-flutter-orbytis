@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:inspecampo/blocs/history/history_bloc.dart';
 import 'package:inspecampo/data/database.dart';
-import 'package:inspecampo/repositories/inspection_repository.dart';
+import 'package:inspecampo/models/inspection_status.dart';
 
 Inspection _inspection(int id, String status) {
   return Inspection(
@@ -17,11 +17,11 @@ Inspection _inspection(int id, String status) {
 void main() {
   group('HistoryState', () {
     final inspections = [
-      _inspection(1, InspectionStatus.draft),
-      _inspection(2, InspectionStatus.pending),
-      _inspection(3, InspectionStatus.synced),
-      _inspection(4, InspectionStatus.failed),
-      _inspection(5, InspectionStatus.pending),
+      _inspection(1, InspectionStatus.draft.value),
+      _inspection(2, InspectionStatus.pending.value),
+      _inspection(3, InspectionStatus.synced.value),
+      _inspection(4, InspectionStatus.failed.value),
+      _inspection(5, InspectionStatus.pending.value),
     ];
 
     test('começa carregando, sem sincronizar e com filtro Todos', () {
@@ -52,11 +52,11 @@ void main() {
     test('filtro sem nenhuma inspeção do status devolve lista vazia', () {
       final state = HistoryState(
         isLoading: false,
-        inspections: [_inspection(1, InspectionStatus.synced)],
+        inspections: [_inspection(1, InspectionStatus.synced.value)],
         filter: HistoryFilter.draft,
       );
 
       expect(state.filtered, isEmpty);
     });
- });
+  });
 }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
-class AppColors {
+import '../models/inspection_status.dart';
+import '../models/work_order_status.dart';
 
+class AppColors {
   static const loginTop = Color(0xFF3C096C);
   static const loginBottom = Color(0xFF7512D2);
   static const loginCard = Color(0xFFFFFFFF);
@@ -11,12 +13,10 @@ class AppColors {
   static const background = Color(0xFF3C096C);
   static const surface = Color(0xFFFFFFFF);
 
-
   static const draft = Color(0xFF8A8A8A);
   static const pending = Color(0xFFE8A33D);
   static const synced = Color(0xFF2E9E5B);
   static const failed = Color(0xFFD9463E);
-
 
   static const priorityHigh = Color(0xFFD9463E);
   static const priorityMedium = Color(0xFFE8A33D);
@@ -28,12 +28,11 @@ class AppColors {
 }
 
 class AppGradient {
-  static const grad = LinearGradient (
+  static const grad = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [AppColors.loginTop, AppColors.loginBottom]
+    colors: [AppColors.loginTop, AppColors.loginBottom],
   );
-
 }
 
 class AppTheme {
@@ -79,98 +78,72 @@ class AppTheme {
           borderRadius: BorderRadius.circular(10),
           borderSide: const BorderSide(color: Color(0xFFDDDDDD)),
         ),
-        contentPadding:
-        const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 14,
+        ),
       ),
       cardTheme: CardThemeData(
         color: Colors.white,
         elevation: 1,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }
 }
 
 Color colorForSyncStatus(String status) {
-  switch (status) {
-    case 'draft':
-      return AppColors.draft;
-    case 'pending':
-      return AppColors.pending;
-    case 'synced':
-      return AppColors.synced;
-    case 'failed':
-      return AppColors.failed;
-    default:
-      return AppColors.draft;
-  }
+  return switch (InspectionStatus.fromValue(status)) {
+    InspectionStatus.draft => AppColors.draft,
+    InspectionStatus.pending => AppColors.pending,
+    InspectionStatus.synced => AppColors.synced,
+    InspectionStatus.failed => AppColors.failed,
+    null => AppColors.draft,
+  };
 }
 
 String labelForSyncStatus(String status) {
-  switch (status) {
-    case 'draft':
-      return 'RASCUNHO';
-    case 'pending':
-      return 'PENDENTE';
-    case 'synced':
-      return 'SINCRONIZADO';
-    case 'failed':
-      return 'FALHOU';
-    default:
-      return status.toUpperCase();
-  }
+  return switch (InspectionStatus.fromValue(status)) {
+    InspectionStatus.draft => 'RASCUNHO',
+    InspectionStatus.pending => 'PENDENTE',
+    InspectionStatus.synced => 'SINCRONIZADO',
+    InspectionStatus.failed => 'FALHOU',
+    null => status.toUpperCase(),
+  };
 }
 
 Color colorForWorkOrderStatus(String status) {
-  switch (status) {
-    case 'open':
-      return AppColors.draft;
-    case 'in_progress':
-      return AppColors.pending;
-    case 'done':
-      return AppColors.synced;
-    default:
-      return AppColors.draft;
-  }
+  return switch (WorkOrderStatus.fromValue(status)) {
+    WorkOrderStatus.open => AppColors.draft,
+    WorkOrderStatus.inProgress => AppColors.pending,
+    WorkOrderStatus.done => AppColors.synced,
+    null => AppColors.draft,
+  };
 }
 
 String labelForWorkOrderStatus(String status) {
-  switch (status) {
-    case 'open':
-      return 'ABERTA';
-    case 'in_progress':
-      return 'EM ANDAMENTO';
-    case 'done':
-      return 'CONCLUÍDA';
-    default:
-      return status.toUpperCase();
-  }
+  return switch (WorkOrderStatus.fromValue(status)) {
+    WorkOrderStatus.open => 'ABERTA',
+    WorkOrderStatus.inProgress => 'EM ANDAMENTO',
+    WorkOrderStatus.done => 'CONCLUÍDA',
+    null => status.toUpperCase(),
+  };
 }
 
 Color colorForPriority(String priority) {
-  switch (priority) {
-    case 'high':
-      return AppColors.priorityHigh;
-    case 'medium':
-      return AppColors.priorityMedium;
-    case 'low':
-      return AppColors.priorityLow;
-    default:
-      return AppColors.priorityLow;
-  }
+  return switch (WorkOrderPriority.fromValue(priority)) {
+    WorkOrderPriority.high => AppColors.priorityHigh,
+    WorkOrderPriority.medium => AppColors.priorityMedium,
+    WorkOrderPriority.low => AppColors.priorityLow,
+    null => AppColors.priorityLow,
+  };
 }
 
 String labelForPriority(String priority) {
-  switch (priority) {
-    case 'high':
-      return 'ALTA';
-    case 'medium':
-      return 'MÉDIA';
-    case 'low':
-      return 'BAIXA';
-    default:
-      return priority.toUpperCase();
-  }
+  return switch (WorkOrderPriority.fromValue(priority)) {
+    WorkOrderPriority.high => 'ALTA',
+    WorkOrderPriority.medium => 'MÉDIA',
+    WorkOrderPriority.low => 'BAIXA',
+    null => priority.toUpperCase(),
+  };
 }

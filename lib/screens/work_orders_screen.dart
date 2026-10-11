@@ -4,16 +4,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inspecampo/blocs/auth/auth_bloc.dart';
 import 'package:inspecampo/blocs/work_orders/work_orders_bloc.dart';
 import '../models/work_order.dart';
+import '../models/work_order_status.dart';
 import '../repositories/work_orders_repository.dart';
 import '../router/app_router.dart';
 import '../theme/app_theme.dart';
 import '../repositories/inspection_repository.dart';
 
-IconData _iconForWorkOrderStatus(String status) => switch (status) {
-  'done' => Icons.check_circle,
-  'in_progress' => Icons.schedule,
-  _ => Icons.description_outlined,
-};
+IconData _iconForWorkOrderStatus(String status) =>
+    switch (WorkOrderStatus.fromValue(status)) {
+      WorkOrderStatus.done => Icons.check_circle,
+      WorkOrderStatus.inProgress => Icons.schedule,
+      _ => Icons.description_outlined,
+    };
 
 @RoutePage()
 class WorkOrdersScreen extends StatelessWidget implements AutoRouteWrapper {
@@ -46,9 +48,9 @@ class WorkOrdersScreen extends StatelessWidget implements AutoRouteWrapper {
   }
 
   Future<void> _openWorkOrder(BuildContext context, WorkOrder workOrder) async {
-    final draft = await context
-        .read<InspectionRepository>()
-        .getDraftFor(workOrder.id);
+    final draft = await context.read<InspectionRepository>().getDraftFor(
+      workOrder.id,
+    );
     if (!context.mounted) return;
 
     await context.router.push(
@@ -57,8 +59,6 @@ class WorkOrdersScreen extends StatelessWidget implements AutoRouteWrapper {
     if (context.mounted) _refresh(context);
   }
 
-  /// Abre o histórico e, ao voltar, recarrega a lista (uma OS pode ter sido
-  /// concluída lá).
   Future<void> _openHistory(BuildContext context) async {
     await context.router.push(const HistoryRoute());
     if (context.mounted) _refresh(context);
@@ -66,12 +66,7 @@ class WorkOrdersScreen extends StatelessWidget implements AutoRouteWrapper {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthBloc, AuthState>(
-      listenWhen: (_, current) => current is AuthUnauthenticated,
-      listener: (context, _) {
-        context.router.replaceAll([const LoginRoute()]);
-      },
-      child: Scaffold(
+    return Scaffold(
         body: Container(
           decoration: const BoxDecoration(gradient: AppGradient.grad),
           child: SafeArea(
@@ -221,7 +216,6 @@ class WorkOrdersScreen extends StatelessWidget implements AutoRouteWrapper {
             ],
           ),
         ),
-      ),
     );
   }
 }
@@ -351,6 +345,11 @@ class _WorkOrderCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     _InfoRow(icon: Icons.location_on, text: workOrder.address),
+                    const SizedBox(height: 6),
+                    _InfoRow(
+                      icon: Icons.flag_outlined,
+                      text: 'Prioridade: ${labelForPriority(workOrder.priority)}',
+                    ),
                   ],
                 ),
               ),

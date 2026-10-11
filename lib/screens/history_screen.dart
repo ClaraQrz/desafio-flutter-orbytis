@@ -4,11 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../blocs/history/history_bloc.dart';
 import '../data/database.dart';
-import '../repositories/inspection_repository.dart';
+import '../models/inspection_status.dart';
 import '../repositories/work_orders_repository.dart';
 import '../router/app_router.dart';
-import '../services/connectivity_service.dart';
-import '../services/sync_service.dart';
 import '../theme/app_theme.dart';
 
 @RoutePage()
@@ -17,14 +15,8 @@ class HistoryScreen extends StatelessWidget implements AutoRouteWrapper {
 
   @override
   Widget wrappedRoute(BuildContext context) {
-    return BlocProvider(
-      create: (context) => HistoryBloc(
-        repository: context.read<InspectionRepository>(),
-        syncService: context.read<SyncService>(),
-        connectivity: context.read<ConnectivityService>(),
-      )..add(const HistoryEvent.loadRequested()),
-      child: this,
-    );
+    context.read<HistoryBloc>().add(const HistoryEvent.loadRequested());
+    return this;
   }
 
   void _showSnack(BuildContext context, String message) {
@@ -45,7 +37,7 @@ class HistoryScreen extends StatelessWidget implements AutoRouteWrapper {
     BuildContext context,
     Inspection inspection,
   ) async {
-    final readOnly = inspection.status != InspectionStatus.draft;
+    final readOnly = inspection.status != InspectionStatus.draft.value;
 
     final workOrder = await context
         .read<WorkOrdersRepository>()
@@ -201,7 +193,7 @@ class _InspectionList extends StatelessWidget {
               return _InspectionCard(
                 inspection: inspection,
                 onTap: () => onOpen(inspection),
-                onRetry: inspection.status == InspectionStatus.failed
+                onRetry: inspection.status == InspectionStatus.failed.value
                     ? () => context.read<HistoryBloc>().add(
                         HistoryEvent.retryRequested(inspection),
                       )
@@ -228,7 +220,7 @@ class _InspectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDraft = inspection.status == InspectionStatus.draft;
+    final isDraft = inspection.status == InspectionStatus.draft.value;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -292,7 +284,7 @@ class _InspectionCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    if (inspection.status == InspectionStatus.failed &&
+                    if (inspection.status == InspectionStatus.failed.value &&
                         inspection.errorMessage != null) ...[
                       const SizedBox(height: 6),
                       Text(

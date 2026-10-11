@@ -139,9 +139,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 labelText: 'E-mail',
                                 prefixIcon: Icon(Icons.email_outlined),
                                 border: OutlineInputBorder(
-                                  // borderSide: BorderSide(
-                                  // color: Color(0xFF838383),
-                                  //),
                                   borderRadius: BorderRadius.all(
                                     Radius.circular(15),
                                   ),
@@ -243,13 +240,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                           strokeWidth: 2,
                                         ),
                                       )
-                                    : const Text('ENTRAR', style: TextStyle(
-                                        fontFamily: 'Urbanist',
-                                        fontWeight: FontWeight.w600,
+                                    : const Text(
+                                        'ENTRAR',
+                                        style: TextStyle(
+                                          fontFamily: 'Urbanist',
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
                               ),
                             ),
-                            )
                           ],
                         ),
                       ),
@@ -266,32 +265,32 @@ class _LoginScreenState extends State<LoginScreen> {
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 28,
-                              fontFamily: 'Urbanist',
-                            fontWeight: FontWeight.w300,
-                            color: Color.fromARGB(255, 159, 86, 226),
-                            letterSpacing: 0.3,
-                          ),
+                                fontFamily: 'Urbanist',
+                                fontWeight: FontWeight.w300,
+                                color: Color.fromARGB(255, 159, 86, 226),
+                                letterSpacing: 0.3,
+                              ),
+                            ),
+                            Text(
+                              'Campo',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontFamily: 'Urbanist',
+                                fontWeight: FontWeight.w700,
+                                color: Color.fromARGB(255, 159, 86, 226),
+                                letterSpacing: 0.3,
+                              ),
+                            ),
+                          ],
                         ),
-                         Text(
-                          'Campo',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontFamily: 'Urbanist',
-                            fontWeight: FontWeight.w700,
-                            color: Color.fromARGB(255, 159, 86, 226),
-                            letterSpacing: 0.3,
                       ),
-                     )
                     ],
                   ),
                 ),
-                    ]
               ),
             ),
           ),
-         )
-          )
         );
       },
     );

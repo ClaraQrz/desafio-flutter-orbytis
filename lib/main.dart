@@ -7,6 +7,7 @@ import 'theme/app_theme.dart';
 
 import 'blocs/login/login_bloc.dart';
 import 'blocs/auth/auth_bloc.dart';
+import 'blocs/history/history_bloc.dart';
 
 import 'repositories/auth_repository.dart';
 import 'repositories/inspection_repository.dart';
@@ -51,7 +52,7 @@ void main() {
       syncService: syncService,
       photoService: photoService,
       connectivityService: connectivityService,
-      appRouter: AppRouter(),
+      appRouter: AppRouter(authRepository),
     ),
   );
 }
@@ -89,18 +90,43 @@ class InspecaoCampoApp extends StatelessWidget {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (_) => AuthBloc(authRepository)
-              ..add(const AuthEvent.started()),
+            lazy: false,
+            create: (_) {
+              final bloc = AuthBloc(authRepository)
+                ..add(const AuthEvent.started());
+              ApiClient.onSessionExpired = () {
+                if (!bloc.isClosed && bloc.state is AuthAuthenticated) {
+                  bloc.add(const AuthEvent.sessionExpired());
+                }
+              };
+              return bloc;
+            },
+          ),
+          BlocProvider(
+            lazy: false,
+            create: (context) => HistoryBloc(
+              repository: inspectionRepository,
+              syncService: syncService,
+              connectivity: connectivityService,
+              authBloc: context.read<AuthBloc>(),
+            )..add(const HistoryEvent.loadRequested()),
           ),
           BlocProvider(
             create: (_) => LoginBloc(authRepository),
           ),
         ],
-        child: MaterialApp.router(
-          title: 'InspecCampo',
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.light,
-          routerConfig: appRouter.config(),
+        child: BlocListener<AuthBloc, AuthState>(
+          listenWhen: (previous, current) =>
+              previous is AuthAuthenticated && current is AuthUnauthenticated,
+          listener: (context, state) {
+            appRouter.replaceAll([const LoginRoute()]);
+          },
+          child: MaterialApp.router(
+            title: 'InspecCampo',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.light,
+            routerConfig: appRouter.config(),
+          ),
         ),
       ),
     );

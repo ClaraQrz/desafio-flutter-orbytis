@@ -2,13 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
 import '../data/database.dart';
-
-abstract final class InspectionStatus {
-  static const draft = 'draft';
-  static const pending = 'pending';
-  static const synced = 'synced';
-  static const failed = 'failed';
-}
+import '../models/inspection_status.dart';
 
 class InspectionRepository {
   InspectionRepository({required AppDatabase database}) : _db = database;
@@ -55,9 +49,9 @@ class InspectionRepository {
   }
 
   Future<List<Inspection>> getAll() {
-    return (_db.select(_db.inspections)
-          ..orderBy([(t) => OrderingTerm.desc(t.capturedAt)]))
-        .get();
+    return (_db.select(
+      _db.inspections,
+    )..orderBy([(t) => OrderingTerm.desc(t.capturedAt)])).get();
   }
 
   Future<Inspection?> getDraftFor(String workOrderId) {
@@ -65,7 +59,7 @@ class InspectionRepository {
           ..where(
             (t) =>
                 t.workOrderId.equals(workOrderId) &
-                t.status.equals(InspectionStatus.draft),
+                t.status.equals(InspectionStatus.draft.value),
           )
           ..orderBy([(t) => OrderingTerm.desc(t.capturedAt)])
           ..limit(1))
@@ -76,8 +70,8 @@ class InspectionRepository {
     return (_db.select(_db.inspections)
           ..where(
             (t) => t.status.isIn([
-              InspectionStatus.pending,
-              InspectionStatus.failed,
+              InspectionStatus.pending.value,
+              InspectionStatus.failed.value,
             ]),
           )
           ..orderBy([(t) => OrderingTerm.asc(t.capturedAt)]))
@@ -87,7 +81,7 @@ class InspectionRepository {
   Future<void> markAsSynced(int id, String serverId) {
     return (_db.update(_db.inspections)..where((t) => t.id.equals(id))).write(
       InspectionsCompanion(
-        status: const Value(InspectionStatus.synced),
+        status: Value(InspectionStatus.synced.value),
         serverId: Value(serverId),
         errorMessage: const Value(null),
       ),
@@ -97,7 +91,7 @@ class InspectionRepository {
   Future<void> markAsFailed(int id, String message) {
     return (_db.update(_db.inspections)..where((t) => t.id.equals(id))).write(
       InspectionsCompanion(
-        status: const Value(InspectionStatus.failed),
+        status: Value(InspectionStatus.failed.value),
         errorMessage: Value(message),
       ),
     );
@@ -129,7 +123,7 @@ class InspectionRepository {
   }) {
     return (_db.update(_db.inspections)..where((t) => t.id.equals(id))).write(
       InspectionsCompanion(
-        status: const Value(InspectionStatus.pending),
+        status: Value(InspectionStatus.pending.value),
         observation: Value(observation),
         photoPath: Value(photoPath),
         latitude: Value(latitude),
@@ -140,7 +134,7 @@ class InspectionRepository {
   }
 
   Future<String> _insert({
-    required String status,
+    required InspectionStatus status,
     required String workOrderId,
     required String observation,
     String? photoPath,
@@ -157,7 +151,7 @@ class InspectionRepository {
             workOrderId: workOrderId,
             observation: observation,
             capturedAt: DateTime.now(),
-            status: Value(status),
+            status: Value(status.value),
             photoPath: Value(photoPath),
             latitude: Value(latitude),
             longitude: Value(longitude),

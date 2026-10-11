@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../data/database.dart';
+import '../auth/auth_bloc.dart';
+import '../../models/inspection_status.dart';
 import '../../repositories/inspection_repository.dart';
 import '../../services/connectivity_service.dart';
 import '../../services/sync_service.dart';
@@ -17,7 +19,9 @@ class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
     required InspectionRepository repository,
     required this._syncService,
     required ConnectivityService connectivity,
+    required AuthBloc authBloc,
   })  : _repo = repository,
+        _authBloc = authBloc,
         super(const HistoryState()) {
     on<HistoryLoadRequested>(_onLoadRequested);
     on<HistoryFilterChanged>(_onFilterChanged);
@@ -25,14 +29,27 @@ class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
     on<HistoryRetryRequested>(_onRetryRequested);
     on<HistoryConnectivityChanged>(_onConnectivityChanged);
 
-    _connectivitySub = connectivity.onChanged.listen(
-      (isOnline) => add(HistoryEvent.connectivityChanged(isOnline)),
-    );
+    _connectivitySub = connectivity.onChanged.listen((isOnline) {
+      if (!isClosed) {
+        add(HistoryEvent.connectivityChanged(isOnline));
+      }
+    });
+
+    _authSub = authBloc.stream.listen((authState) async {
+      if (authState is! AuthAuthenticated) return;
+      try {
+        if (await connectivity.isOnline() && !isClosed) {
+          add(const HistoryEvent.connectivityChanged(true));
+        }
+      } catch (_) {}
+    });
   }
 
   final InspectionRepository _repo;
   final SyncService _syncService;
+  final AuthBloc _authBloc;
   late final StreamSubscription<bool> _connectivitySub;
+  late final StreamSubscription<AuthState> _authSub;
 
   Future<void> reload() {
     final completer = Completer<void>();
@@ -41,8 +58,9 @@ class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
   }
 
   @override
-  Future<void> close() {
-    _connectivitySub.cancel();
+  Future<void> close() async {
+    await _connectivitySub.cancel();
+    await _authSub.cancel();
     return super.close();
   }
 
@@ -85,7 +103,7 @@ class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
     HistoryConnectivityChanged event,
     Emitter<HistoryState> emit,
   ) async {
-    if (!event.isOnline) return;
+    if (!event.isOnline || _authBloc.state is! AuthAuthenticated) return;
     await _sync(emit, silent: true);
   }
 
@@ -93,7 +111,11 @@ class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
     Emitter<HistoryState> emit, {
     required bool silent,
   }) async {
-    if (state.isSyncing) return;
+    if (state.isSyncing ||
+        _syncService.isSyncing ||
+        _authBloc.state is! AuthAuthenticated) {
+      return;
+    }
     emit(state.copyWith(isSyncing: true));
 
     try {
@@ -119,10 +141,17 @@ class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
     HistoryRetryRequested event,
     Emitter<HistoryState> emit,
   ) async {
+    if (state.isSyncing ||
+        _syncService.isSyncing ||
+        _authBloc.state is! AuthAuthenticated) {
+      return;
+    }
+
+    emit(state.copyWith(isSyncing: true));
     try {
       final success = await _syncService.syncOne(event.inspection);
       final list = await _repo.getAll();
-      emit(state.copyWith(inspections: list));
+      emit(state.copyWith(isSyncing: false, inspections: list));
       _notify(
         emit,
         success
@@ -130,6 +159,7 @@ class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
             : 'Falha ao sincronizar. Será tentado novamente mais tarde.',
       );
     } catch (_) {
+      emit(state.copyWith(isSyncing: false));
       _notify(emit, 'Erro ao sincronizar. Tente novamente.');
     }
   }

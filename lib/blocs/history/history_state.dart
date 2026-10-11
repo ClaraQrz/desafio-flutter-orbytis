@@ -10,8 +10,7 @@ enum HistoryFilter {
   const HistoryFilter(this.label, this.status);
 
   final String label;
-
-  final String? status;
+  final InspectionStatus? status;
 }
 
 @freezed
@@ -23,13 +22,12 @@ abstract class HistoryState with _$HistoryState {
     @Default(false) bool isSyncing,
     @Default(<Inspection>[]) List<Inspection> inspections,
     @Default(HistoryFilter.all) HistoryFilter filter,
-
     String? message,
   }) = _HistoryState;
 
   List<Inspection> get filtered {
     final status = filter.status;
     if (status == null) return inspections;
-    return inspections.where((i) => i.status == status).toList();
+    return inspections.where((i) => i.status == status.value).toList();
   }
 }
