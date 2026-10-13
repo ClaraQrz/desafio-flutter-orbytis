@@ -832,15 +832,15 @@ class $CachedWorkOrdersTable extends CachedWorkOrders
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _statusMeta = const VerificationMeta('status');
   @override
-  late final GeneratedColumn<String> status = GeneratedColumn<String>(
-    'status',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
+  late final GeneratedColumnWithTypeConverter<WorkOrderStatus, String> status =
+      GeneratedColumn<String>(
+        'status',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<WorkOrderStatus>($CachedWorkOrdersTable.$converterstatus);
   static const VerificationMeta _latitudeMeta = const VerificationMeta(
     'latitude',
   );
@@ -935,14 +935,6 @@ class $CachedWorkOrdersTable extends CachedWorkOrders
     } else if (isInserting) {
       context.missing(_priorityMeta);
     }
-    if (data.containsKey('status')) {
-      context.handle(
-        _statusMeta,
-        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_statusMeta);
-    }
     if (data.containsKey('latitude')) {
       context.handle(
         _latitudeMeta,
@@ -988,10 +980,12 @@ class $CachedWorkOrdersTable extends CachedWorkOrders
         DriftSqlType.string,
         data['${effectivePrefix}priority'],
       )!,
-      status: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}status'],
-      )!,
+      status: $CachedWorkOrdersTable.$converterstatus.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}status'],
+        )!,
+      ),
       latitude: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}latitude'],
@@ -1007,6 +1001,9 @@ class $CachedWorkOrdersTable extends CachedWorkOrders
   $CachedWorkOrdersTable createAlias(String alias) {
     return $CachedWorkOrdersTable(attachedDatabase, alias);
   }
+
+  static JsonTypeConverter2<WorkOrderStatus, String, String> $converterstatus =
+      const EnumNameConverter<WorkOrderStatus>(WorkOrderStatus.values);
 }
 
 class CachedWorkOrder extends DataClass implements Insertable<CachedWorkOrder> {
@@ -1016,7 +1013,7 @@ class CachedWorkOrder extends DataClass implements Insertable<CachedWorkOrder> {
   final String description;
   final String address;
   final String priority;
-  final String status;
+  final WorkOrderStatus status;
   final double? latitude;
   final double? longitude;
   const CachedWorkOrder({
@@ -1039,7 +1036,11 @@ class CachedWorkOrder extends DataClass implements Insertable<CachedWorkOrder> {
     map['description'] = Variable<String>(description);
     map['address'] = Variable<String>(address);
     map['priority'] = Variable<String>(priority);
-    map['status'] = Variable<String>(status);
+    {
+      map['status'] = Variable<String>(
+        $CachedWorkOrdersTable.$converterstatus.toSql(status),
+      );
+    }
     if (!nullToAbsent || latitude != null) {
       map['latitude'] = Variable<double>(latitude);
     }
@@ -1079,7 +1080,9 @@ class CachedWorkOrder extends DataClass implements Insertable<CachedWorkOrder> {
       description: serializer.fromJson<String>(json['description']),
       address: serializer.fromJson<String>(json['address']),
       priority: serializer.fromJson<String>(json['priority']),
-      status: serializer.fromJson<String>(json['status']),
+      status: $CachedWorkOrdersTable.$converterstatus.fromJson(
+        serializer.fromJson<String>(json['status']),
+      ),
       latitude: serializer.fromJson<double?>(json['latitude']),
       longitude: serializer.fromJson<double?>(json['longitude']),
     );
@@ -1094,7 +1097,9 @@ class CachedWorkOrder extends DataClass implements Insertable<CachedWorkOrder> {
       'description': serializer.toJson<String>(description),
       'address': serializer.toJson<String>(address),
       'priority': serializer.toJson<String>(priority),
-      'status': serializer.toJson<String>(status),
+      'status': serializer.toJson<String>(
+        $CachedWorkOrdersTable.$converterstatus.toJson(status),
+      ),
       'latitude': serializer.toJson<double?>(latitude),
       'longitude': serializer.toJson<double?>(longitude),
     };
@@ -1107,7 +1112,7 @@ class CachedWorkOrder extends DataClass implements Insertable<CachedWorkOrder> {
     String? description,
     String? address,
     String? priority,
-    String? status,
+    WorkOrderStatus? status,
     Value<double?> latitude = const Value.absent(),
     Value<double?> longitude = const Value.absent(),
   }) => CachedWorkOrder(
@@ -1187,7 +1192,7 @@ class CachedWorkOrdersCompanion extends UpdateCompanion<CachedWorkOrder> {
   final Value<String> description;
   final Value<String> address;
   final Value<String> priority;
-  final Value<String> status;
+  final Value<WorkOrderStatus> status;
   final Value<double?> latitude;
   final Value<double?> longitude;
   final Value<int> rowid;
@@ -1210,7 +1215,7 @@ class CachedWorkOrdersCompanion extends UpdateCompanion<CachedWorkOrder> {
     required String description,
     required String address,
     required String priority,
-    required String status,
+    required WorkOrderStatus status,
     this.latitude = const Value.absent(),
     this.longitude = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -1254,7 +1259,7 @@ class CachedWorkOrdersCompanion extends UpdateCompanion<CachedWorkOrder> {
     Value<String>? description,
     Value<String>? address,
     Value<String>? priority,
-    Value<String>? status,
+    Value<WorkOrderStatus>? status,
     Value<double?>? latitude,
     Value<double?>? longitude,
     Value<int>? rowid,
@@ -1295,7 +1300,9 @@ class CachedWorkOrdersCompanion extends UpdateCompanion<CachedWorkOrder> {
       map['priority'] = Variable<String>(priority.value);
     }
     if (status.present) {
-      map['status'] = Variable<String>(status.value);
+      map['status'] = Variable<String>(
+        $CachedWorkOrdersTable.$converterstatus.toSql(status.value),
+      );
     }
     if (latitude.present) {
       map['latitude'] = Variable<double>(latitude.value);
@@ -1715,7 +1722,7 @@ typedef $$CachedWorkOrdersTableCreateCompanionBuilder =
       required String description,
       required String address,
       required String priority,
-      required String status,
+      required WorkOrderStatus status,
       Value<double?> latitude,
       Value<double?> longitude,
       Value<int> rowid,
@@ -1728,7 +1735,7 @@ typedef $$CachedWorkOrdersTableUpdateCompanionBuilder =
       Value<String> description,
       Value<String> address,
       Value<String> priority,
-      Value<String> status,
+      Value<WorkOrderStatus> status,
       Value<double?> latitude,
       Value<double?> longitude,
       Value<int> rowid,
@@ -1773,9 +1780,10 @@ class $$CachedWorkOrdersTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get status => $composableBuilder(
+  ColumnWithTypeConverterFilters<WorkOrderStatus, WorkOrderStatus, String>
+  get status => $composableBuilder(
     column: $table.status,
-    builder: (column) => ColumnFilters(column),
+    builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
   ColumnFilters<double> get latitude => $composableBuilder(
@@ -1873,7 +1881,7 @@ class $$CachedWorkOrdersTableAnnotationComposer
   GeneratedColumn<String> get priority =>
       $composableBuilder(column: $table.priority, builder: (column) => column);
 
-  GeneratedColumn<String> get status =>
+  GeneratedColumnWithTypeConverter<WorkOrderStatus, String> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
 
   GeneratedColumn<double> get latitude =>
@@ -1926,7 +1934,7 @@ class $$CachedWorkOrdersTableTableManager
                 Value<String> description = const Value.absent(),
                 Value<String> address = const Value.absent(),
                 Value<String> priority = const Value.absent(),
-                Value<String> status = const Value.absent(),
+                Value<WorkOrderStatus> status = const Value.absent(),
                 Value<double?> latitude = const Value.absent(),
                 Value<double?> longitude = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -1950,7 +1958,7 @@ class $$CachedWorkOrdersTableTableManager
                 required String description,
                 required String address,
                 required String priority,
-                required String status,
+                required WorkOrderStatus status,
                 Value<double?> latitude = const Value.absent(),
                 Value<double?> longitude = const Value.absent(),
                 Value<int> rowid = const Value.absent(),

@@ -168,10 +168,10 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
     );
   }
 
-  (String, IconData, Color) _statusChip(String status) {
+  (String, IconData, Color) _statusChip(WorkOrderStatus status) {
     final label = labelForWorkOrderStatus(status);
 
-    return switch (WorkOrderStatus.fromValue(status)) {
+    return switch (status) {
       WorkOrderStatus.done => (label, Icons.check_circle, AppColors.synced),
       WorkOrderStatus.inProgress => (label, Icons.timelapse, AppColors.primary),
       WorkOrderStatus.open ||

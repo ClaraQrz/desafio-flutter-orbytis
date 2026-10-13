@@ -112,21 +112,19 @@ String labelForSyncStatus(String status) {
   };
 }
 
-Color colorForWorkOrderStatus(String status) {
-  return switch (WorkOrderStatus.fromValue(status)) {
+Color colorForWorkOrderStatus(WorkOrderStatus status) {
+  return switch (status) {
     WorkOrderStatus.open => AppColors.draft,
     WorkOrderStatus.inProgress => AppColors.pending,
     WorkOrderStatus.done => AppColors.synced,
-    null => AppColors.draft,
   };
 }
 
-String labelForWorkOrderStatus(String status) {
-  return switch (WorkOrderStatus.fromValue(status)) {
+String labelForWorkOrderStatus(WorkOrderStatus status) {
+  return switch (status) {
     WorkOrderStatus.open => 'ABERTA',
     WorkOrderStatus.inProgress => 'EM ANDAMENTO',
     WorkOrderStatus.done => 'CONCLUÍDA',
-    null => status.toUpperCase(),
   };
 }
 

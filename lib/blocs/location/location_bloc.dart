@@ -8,7 +8,9 @@ import 'package:latlong2/latlong.dart';
 import '../../services/route_service.dart';
 
 part 'location_event.dart';
+
 part 'location_state.dart';
+
 part 'location_bloc.freezed.dart';
 
 const kGeofenceRadiusMeters = 50.0;
@@ -23,10 +25,9 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     this.radiusMeters = kGeofenceRadiusMeters,
     double? initialLatitude,
     double? initialLongitude,
-  }) : super(LocationState(
-          latitude: initialLatitude,
-          longitude: initialLongitude,
-        )) {
+  }) : super(
+         LocationState(latitude: initialLatitude, longitude: initialLongitude),
+       ) {
     on<LocationRequested>(_onRequested);
     on<LocationUpdated>(_onUpdated);
     on<LocationFailed>(_onFailed);
@@ -47,9 +48,9 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
   bool get hasTarget => targetLatitude != null && targetLongitude != null;
 
   Future<void> _onRequested(
-      LocationRequested event,
-      Emitter<LocationState> emit,
-      ) async {
+    LocationRequested event,
+    Emitter<LocationState> emit,
+  ) async {
     if (state.isLoading) return;
 
     await _subscription?.cancel();
@@ -82,23 +83,22 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
       emit(_withPosition(first.latitude, first.longitude));
       _maybeFetchRoute();
 
-      _subscription = Geolocator.getPositionStream(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-          distanceFilter: 2,
-        ),
-      ).listen(
-            (p) => add(LocationUpdated(
-          latitude: p.latitude,
-          longitude: p.longitude,
-        )),
-        onError: (Object e) => add(LocationFailed(_messageFor(e))),
-      );
+      _subscription =
+          Geolocator.getPositionStream(
+            locationSettings: const LocationSettings(
+              accuracy: LocationAccuracy.high,
+              distanceFilter: 2,
+            ),
+          ).listen(
+            (p) => add(
+              LocationUpdated(latitude: p.latitude, longitude: p.longitude),
+            ),
+            onError: (Object e) => add(LocationFailed(_messageFor(e))),
+          );
     } catch (e) {
-      emit(state.copyWith(
-        status: LocationStatus.failure,
-        error: _messageFor(e),
-      ));
+      emit(
+        state.copyWith(status: LocationStatus.failure, error: _messageFor(e)),
+      );
     }
   }
 
@@ -115,17 +115,19 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     if (!state.hasCurrent) return;
     if (hasTarget && !state.isInRange) return;
 
-    emit(state.copyWith(
-      latitude: state.currentLatitude,
-      longitude: state.currentLongitude,
-      error: null,
-    ));
+    emit(
+      state.copyWith(
+        latitude: state.currentLatitude,
+        longitude: state.currentLongitude,
+        error: null,
+      ),
+    );
   }
 
   Future<void> _onRouteRequested(
-      LocationRouteRequested event,
-      Emitter<LocationState> emit,
-      ) async {
+    LocationRouteRequested event,
+    Emitter<LocationState> emit,
+  ) async {
     final lat = state.currentLatitude;
     final lng = state.currentLongitude;
     if (lat == null || lng == null || !hasTarget) {
