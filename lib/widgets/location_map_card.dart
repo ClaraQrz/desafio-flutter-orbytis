@@ -165,9 +165,8 @@ class _LocationMapCardState extends State<LocationMapCard> {
           ),
           children: [
             TileLayer(
-              urlTemplate: 'https://{s}.google.com/vt/lyrs=m&y={z}&hl=pt-BR}',
+              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
               userAgentPackageName: 'com.example.inspecampo',
-              subdomains: const ['mt0', 'mt1', 'mt2', 'mt3'],
             ),
 
             if (target != null)

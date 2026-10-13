@@ -24,8 +24,6 @@ abstract class LocationState with _$LocationState {
   }) = _LocationState;
 
   bool get isLoading => status == LocationStatus.loading;
-
   bool get hasCurrent => currentLatitude != null && currentLongitude != null;
-
   bool get hasLocation => latitude != null && longitude != null;
 }

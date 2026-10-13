@@ -1,5 +1,3 @@
-import 'package:inspecampo/models/work_order_status.dart';
-
 class WorkOrder {
   final String id;
   final String code;
@@ -7,7 +5,7 @@ class WorkOrder {
   final String description;
   final String address;
   final String priority;
-  final WorkOrderStatus status;
+  final String status;
   final double? latitude;
   final double? longitude;
 
@@ -31,12 +29,9 @@ class WorkOrder {
       description: json['description'] as String? ?? '',
       address: json['address'] as String,
       priority: json['priority'] as String,
-      status: WorkOrderStatus.fromValue(json['status'] as String)!,
+      status: json['status'] as String,
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
     );
   }
-}
-
-mixin WorkOrdersStatus {
 }

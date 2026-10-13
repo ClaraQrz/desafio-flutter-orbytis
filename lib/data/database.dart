@@ -4,9 +4,6 @@ import 'package:drift/native.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 
-import '../models/inspection_status.dart';
-import '../models/work_order_status.dart';
-
 part 'database.g.dart';
 
 class Inspections extends Table {
@@ -39,7 +36,7 @@ class CachedWorkOrders extends Table {
   TextColumn get description => text()();
   TextColumn get address => text()();
   TextColumn get priority => text()();
-  TextColumn get status => textEnum<WorkOrderStatus>()();
+  TextColumn get status => text()();
   RealColumn get latitude => real().nullable()();
   RealColumn get longitude => real().nullable()();
 
