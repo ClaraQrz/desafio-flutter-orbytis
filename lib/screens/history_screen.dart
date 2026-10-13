@@ -34,9 +34,9 @@ class HistoryScreen extends StatelessWidget implements AutoRouteWrapper {
   }
 
   Future<void> _openInspection(
-    BuildContext context,
-    Inspection inspection,
-  ) async {
+      BuildContext context,
+      Inspection inspection,
+      ) async {
     final readOnly = inspection.status != InspectionStatus.draft.value;
 
     final workOrder = await context
@@ -48,7 +48,7 @@ class HistoryScreen extends StatelessWidget implements AutoRouteWrapper {
       _showSnack(
         context,
         'Não foi possível abrir: a OS ${inspection.workOrderId} '
-        'não está salva no aparelho.',
+            'não está salva no aparelho.',
       );
       return;
     }
@@ -86,19 +86,19 @@ class HistoryScreen extends StatelessWidget implements AutoRouteWrapper {
               builder: (context, state) => IconButton(
                 icon: state.isSyncing
                     ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
-                        ),
-                      )
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2,
+                  ),
+                )
                     : const Icon(Icons.sync),
                 onPressed: state.isSyncing
                     ? null
                     : () => context.read<HistoryBloc>().add(
-                        const HistoryEvent.syncRequested(),
-                      ),
+                  const HistoryEvent.syncRequested(),
+                ),
               ),
             ),
           ],
@@ -158,7 +158,7 @@ class _InspectionList extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<HistoryBloc, HistoryState>(
       buildWhen: (prev, curr) =>
-          prev.isLoading != curr.isLoading ||
+      prev.isLoading != curr.isLoading ||
           prev.inspections != curr.inspections ||
           prev.filter != curr.filter,
       builder: (context, state) {
@@ -195,8 +195,8 @@ class _InspectionList extends StatelessWidget {
                 onTap: () => onOpen(inspection),
                 onRetry: inspection.status == InspectionStatus.failed.value
                     ? () => context.read<HistoryBloc>().add(
-                        HistoryEvent.retryRequested(inspection),
-                      )
+                  HistoryEvent.retryRequested(inspection),
+                )
                     : null,
               );
             },

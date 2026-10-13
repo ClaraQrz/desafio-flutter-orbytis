@@ -25,8 +25,8 @@ class WorkOrdersScreen extends StatelessWidget implements AutoRouteWrapper {
   Widget wrappedRoute(BuildContext context) {
     return BlocProvider(
       create: (context) =>
-          WorkOrdersBloc(context.read<WorkOrdersRepository>())
-            ..add(const WorkOrdersEvent.loadRequested()),
+      WorkOrdersBloc(context.read<WorkOrdersRepository>())
+        ..add(const WorkOrdersEvent.loadRequested()),
       child: this,
     );
   }
@@ -67,41 +67,41 @@ class WorkOrdersScreen extends StatelessWidget implements AutoRouteWrapper {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Container(
-          decoration: const BoxDecoration(gradient: AppGradient.grad),
-          child: SafeArea(
-            bottom: false,
-            child: Column(
-              children: [
-                const _Header(),
-                Expanded(
-                  child: BlocBuilder<WorkOrdersBloc, WorkOrdersState>(
-                    builder: (context, state) {
-                      return switch (state) {
-                        WorkOrdersLoading() => const Center(
-                          child: CircularProgressIndicator(color: Colors.white),
-                        ),
+      body: Container(
+        decoration: const BoxDecoration(gradient: AppGradient.grad),
+        child: SafeArea(
+          bottom: false,
+          child: Column(
+            children: [
+              const _Header(),
+              Expanded(
+                child: BlocBuilder<WorkOrdersBloc, WorkOrdersState>(
+                  builder: (context, state) {
+                    return switch (state) {
+                      WorkOrdersLoading() => const Center(
+                        child: CircularProgressIndicator(color: Colors.white),
+                      ),
 
-                        WorkOrdersEmpty() => _RefreshableList(
-                          onRefresh: () => _refresh(context),
-                          children: const [
-                            SizedBox(height: 120),
-                            Center(
-                              child: Text(
-                                'Nenhuma OS no momento.',
-                                style: TextStyle(
-                                  fontFamily: 'Urbanist',
-                                  color: Colors.white70,
-                                ),
+                      WorkOrdersEmpty() => _RefreshableList(
+                        onRefresh: () => _refresh(context),
+                        children: const [
+                          SizedBox(height: 120),
+                          Center(
+                            child: Text(
+                              'Nenhuma OS no momento.',
+                              style: TextStyle(
+                                fontFamily: 'Urbanist',
+                                color: Colors.white70,
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
+                      ),
 
-                        WorkOrdersFailure(
+                      WorkOrdersFailure(
                           :final message,
                           :final isSessionExpired,
-                        ) =>
+                      ) =>
                           _RefreshableList(
                             onRefresh: () => _refresh(context),
                             children: [
@@ -126,23 +126,23 @@ class WorkOrdersScreen extends StatelessWidget implements AutoRouteWrapper {
                                         width: 200,
                                         child: isSessionExpired
                                             ? FilledButton.icon(
-                                                style: _errorButtonStyle,
-                                                onPressed: () =>
-                                                    _sessionExpired(context),
-                                                icon: const Icon(Icons.login),
-                                                label: const Text(
-                                                  'Fazer login',
-                                                ),
-                                              )
+                                          style: _errorButtonStyle,
+                                          onPressed: () =>
+                                              _sessionExpired(context),
+                                          icon: const Icon(Icons.login),
+                                          label: const Text(
+                                            'Fazer login',
+                                          ),
+                                        )
                                             : FilledButton.icon(
-                                                style: _errorButtonStyle,
-                                                onPressed: () =>
-                                                    _reload(context),
-                                                icon: const Icon(Icons.refresh),
-                                                label: const Text(
-                                                  'Tentar novamente',
-                                                ),
-                                              ),
+                                          style: _errorButtonStyle,
+                                          onPressed: () =>
+                                              _reload(context),
+                                          icon: const Icon(Icons.refresh),
+                                          label: const Text(
+                                            'Tentar novamente',
+                                          ),
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -151,71 +151,71 @@ class WorkOrdersScreen extends StatelessWidget implements AutoRouteWrapper {
                             ],
                           ),
 
-                        WorkOrdersLoaded(:final workOrders) ||
-                        WorkOrdersRefreshing(
+                      WorkOrdersLoaded(:final workOrders) ||
+                      WorkOrdersRefreshing(
                           :final workOrders,
-                        ) => RefreshIndicator(
-                          onRefresh: () => _refresh(context),
-                          child: ListView.builder(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                            itemCount: workOrders.length,
-                            itemBuilder: (context, index) {
-                              final workOrder = workOrders[index];
-                              return _WorkOrderCard(
-                                workOrder: workOrder,
-                                onTap: () => _openWorkOrder(context, workOrder),
-                              );
-                            },
-                          ),
+                      ) => RefreshIndicator(
+                        onRefresh: () => _refresh(context),
+                        child: ListView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                          itemCount: workOrders.length,
+                          itemBuilder: (context, index) {
+                            final workOrder = workOrders[index];
+                            return _WorkOrderCard(
+                              workOrder: workOrder,
+                              onTap: () => _openWorkOrder(context, workOrder),
+                            );
+                          },
                         ),
-                      };
-                    },
-                  ),
+                      ),
+                    };
+                  },
                 ),
-              ],
-            ),
-          ),
-        ),
-        bottomNavigationBar: NavigationBarTheme(
-          data: NavigationBarThemeData(
-            backgroundColor: AppColors.navBar,
-            indicatorColor: AppColors.navIndicator,
-            indicatorShape: const StadiumBorder(),
-            labelTextStyle: const WidgetStatePropertyAll(
-              TextStyle(
-                fontFamily: 'Urbanist',
-                color: Colors.white,
-                fontSize: 12,
               ),
-            ),
-            iconTheme: const WidgetStatePropertyAll(
-              IconThemeData(color: Colors.white),
-            ),
-          ),
-          child: NavigationBar(
-            selectedIndex: 0,
-            onDestinationSelected: (i) {
-              switch (i) {
-                case 1:
-                  _openHistory(context);
-                case 2:
-                  _logout(context);
-              }
-            },
-            destinations: const [
-              NavigationDestination(
-                icon: Icon(Icons.home_rounded),
-                label: 'Início',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.history),
-                label: 'Histórico',
-              ),
-              NavigationDestination(icon: Icon(Icons.logout), label: 'Sair'),
             ],
           ),
         ),
+      ),
+      bottomNavigationBar: NavigationBarTheme(
+        data: NavigationBarThemeData(
+          backgroundColor: AppColors.navBar,
+          indicatorColor: AppColors.navIndicator,
+          indicatorShape: const StadiumBorder(),
+          labelTextStyle: const WidgetStatePropertyAll(
+            TextStyle(
+              fontFamily: 'Urbanist',
+              color: Colors.white,
+              fontSize: 12,
+            ),
+          ),
+          iconTheme: const WidgetStatePropertyAll(
+            IconThemeData(color: Colors.white),
+          ),
+        ),
+        child: NavigationBar(
+          selectedIndex: 0,
+          onDestinationSelected: (i) {
+            switch (i) {
+              case 1:
+                _openHistory(context);
+              case 2:
+                _logout(context);
+            }
+          },
+          destinations: const [
+            NavigationDestination(
+              icon: Icon(Icons.home_rounded),
+              label: 'Início',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.history),
+              label: 'Histórico',
+            ),
+            NavigationDestination(icon: Icon(Icons.logout), label: 'Sair'),
+          ],
+        ),
+      ),
     );
   }
 }

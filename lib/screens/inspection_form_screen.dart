@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
@@ -5,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../blocs/auth/auth_bloc.dart';
+import '../blocs/history/history_bloc.dart';
 import '../blocs/inspection_form/inspection_form_bloc.dart';
 import '../blocs/location/location_bloc.dart';
 import '../data/database.dart';
@@ -13,6 +15,7 @@ import '../models/inspection_status.dart';
 import '../models/work_order_status.dart';
 import '../repositories/inspection_repository.dart';
 import '../router/app_router.dart';
+import '../services/connectivity_service.dart';
 import '../services/photo_service.dart';
 import '../services/route_service.dart';
 import '../theme/app_theme.dart';
@@ -21,9 +24,7 @@ import '../widgets/work_order_map_card.dart';
 @RoutePage()
 class InspectionFormScreen extends StatefulWidget implements AutoRouteWrapper {
   final WorkOrder workOrder;
-
   final Inspection? draft;
-
   final bool readOnly;
 
   const InspectionFormScreen({
@@ -53,7 +54,9 @@ class InspectionFormScreen extends StatefulWidget implements AutoRouteWrapper {
               initialLatitude: draft?.latitude,
               initialLongitude: draft?.longitude,
             );
-            if (!hasLocation && !readOnly) bloc.add(const LocationRequested());
+            if (!hasLocation && !readOnly) {
+              bloc.add(const LocationRequested());
+            }
             return bloc;
           },
         ),
@@ -77,6 +80,8 @@ class InspectionFormScreen extends StatefulWidget implements AutoRouteWrapper {
 
 class _InspectionFormScreenState extends State<InspectionFormScreen> {
   late final TextEditingController _observationController;
+
+  bool _concludingInspection = false;
 
   bool get _readOnly => widget.readOnly;
 
@@ -142,12 +147,17 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
         ),
       ),
     );
+
     if (source == null || !mounted) return;
+
     context.read<InspectionFormBloc>().add(PhotoSourceSelected(source));
   }
 
   void _saveDraft() {
+    _concludingInspection = false;
+
     final loc = context.read<LocationBloc>().state;
+
     context.read<InspectionFormBloc>().add(
       DraftSubmitted(
         observation: _observationController.text,
@@ -158,7 +168,10 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
   }
 
   void _concludeInspection() {
+    _concludingInspection = true;
+
     final loc = context.read<LocationBloc>().state;
+
     context.read<InspectionFormBloc>().add(
       InspectionConcluded(
         observation: _observationController.text,
@@ -166,6 +179,20 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
         longitude: loc.longitude,
       ),
     );
+  }
+
+  Future<void> _tryAutomaticSync() async {
+    final connectivity = context.read<ConnectivityService>();
+    final historyBloc = context.read<HistoryBloc>();
+
+    try {
+      final isOnline = await connectivity.isOnline();
+
+      if (isOnline && !historyBloc.isClosed) {
+        historyBloc.add(const HistoryEvent.connectivityChanged(true));
+      }
+    } catch (_) {
+    }
   }
 
   (String, IconData, Color) _statusChip(String status) {
@@ -196,8 +223,17 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
           listenWhen: (prev, curr) =>
               curr.message != null || (curr.isSuccess && !prev.isSuccess),
           listener: (context, state) {
-            if (state.message != null) _showSnack(state.message!);
-            if (state.isSuccess) context.router.maybePop();
+            if (state.message != null) {
+              _showSnack(state.message!);
+            }
+
+            if (state.isSuccess) {
+              if (_concludingInspection) {
+                unawaited(_tryAutomaticSync());
+              }
+
+              context.router.maybePop();
+            }
           },
         ),
         BlocListener<LocationBloc, LocationState>(
@@ -336,6 +372,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
                       builder: (context, state) {
                         final busy =
                             state.status == InspectionFormStatus.pickingPhoto;
+
                         if (state.photoPath == null) {
                           if (_readOnly) {
                             return const Text(
@@ -346,11 +383,13 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
                               ),
                             );
                           }
+
                           return _AddPhotoBox(
                             busy: busy,
                             onTap: busy ? null : _pickPhoto,
                           );
                         }
+
                         return Align(
                           alignment: Alignment.centerLeft,
                           child: _PhotoThumb(
@@ -395,6 +434,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
                           prev.isSubmitting != curr.isSubmitting,
                       builder: (context, state) {
                         final submitting = state.isSubmitting;
+
                         return Row(
                           children: [
                             Expanded(
@@ -436,6 +476,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
 
 String _formatDate(DateTime date) {
   final local = date.toLocal();
+
   return '${local.day.toString().padLeft(2, '0')}/'
       '${local.month.toString().padLeft(2, '0')}/${local.year} '
       '${local.hour.toString().padLeft(2, '0')}:'
@@ -673,7 +714,6 @@ class _PhotoThumb extends StatelessWidget {
 
   final String path;
   final VoidCallback? onTap;
-
   final VoidCallback? onRemove;
 
   @override
@@ -731,10 +771,12 @@ class _DashedRRectPainter extends CustomPainter {
       ..color = color
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5;
+
     final path = Path()
       ..addRRect(
         RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(10)),
       );
+
     for (final metric in path.computeMetrics()) {
       var distance = 0.0;
       while (distance < metric.length) {

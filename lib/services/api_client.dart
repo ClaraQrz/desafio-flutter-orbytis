@@ -7,7 +7,7 @@ class ApiClient {
 
   static const baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://192.168.15.7:3000',
+    defaultValue: 'http://192.168.88.231:3000',
   );
 
   static final TokenStorage _tokenStorage = TokenStorage();
