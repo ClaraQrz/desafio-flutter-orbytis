@@ -20,9 +20,9 @@ class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
     required this._syncService,
     required ConnectivityService connectivity,
     required AuthBloc authBloc,
-  })  : _repo = repository,
-        _authBloc = authBloc,
-        super(const HistoryState()) {
+  }) : _repo = repository,
+       _authBloc = authBloc,
+       super(const HistoryState()) {
     on<HistoryLoadRequested>(_onLoadRequested);
     on<HistoryFilterChanged>(_onFilterChanged);
     on<HistorySyncRequested>(_onSyncRequested);
@@ -107,10 +107,7 @@ class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
     await _sync(emit, silent: true);
   }
 
-  Future<void> _sync(
-    Emitter<HistoryState> emit, {
-    required bool silent,
-  }) async {
+  Future<void> _sync(Emitter<HistoryState> emit, {required bool silent}) async {
     if (state.isSyncing ||
         _syncService.isSyncing ||
         _authBloc.state is! AuthAuthenticated) {

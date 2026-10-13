@@ -56,25 +56,25 @@ class InspectionRepository {
 
   Future<Inspection?> getDraftFor(String workOrderId) {
     return (_db.select(_db.inspections)
-      ..where(
+          ..where(
             (t) =>
-        t.workOrderId.equals(workOrderId) &
-        t.status.equals(InspectionStatus.draft.value),
-      )
-      ..orderBy([(t) => OrderingTerm.desc(t.capturedAt)])
-      ..limit(1))
+                t.workOrderId.equals(workOrderId) &
+                t.status.equals(InspectionStatus.draft.value),
+          )
+          ..orderBy([(t) => OrderingTerm.desc(t.capturedAt)])
+          ..limit(1))
         .getSingleOrNull();
   }
 
   Future<List<Inspection>> getPendingOrFailed() {
     return (_db.select(_db.inspections)
-      ..where(
+          ..where(
             (t) => t.status.isIn([
-          InspectionStatus.pending.value,
-          InspectionStatus.failed.value,
-        ]),
-      )
-      ..orderBy([(t) => OrderingTerm.asc(t.capturedAt)]))
+              InspectionStatus.pending.value,
+              InspectionStatus.failed.value,
+            ]),
+          )
+          ..orderBy([(t) => OrderingTerm.asc(t.capturedAt)]))
         .get();
   }
 
@@ -146,18 +146,18 @@ class InspectionRepository {
     await _db
         .into(_db.inspections)
         .insert(
-      InspectionsCompanion.insert(
-        clientId: clientId,
-        workOrderId: workOrderId,
-        observation: observation,
-        capturedAt: DateTime.now(),
-        status: Value(status.value),
-        photoPath: Value(photoPath),
-        latitude: Value(latitude),
-        longitude: Value(longitude),
-        createdBy: Value(createdBy),
-      ),
-    );
+          InspectionsCompanion.insert(
+            clientId: clientId,
+            workOrderId: workOrderId,
+            observation: observation,
+            capturedAt: DateTime.now(),
+            status: Value(status.value),
+            photoPath: Value(photoPath),
+            latitude: Value(latitude),
+            longitude: Value(longitude),
+            createdBy: Value(createdBy),
+          ),
+        );
     return clientId;
   }
 }

@@ -111,9 +111,7 @@ class InspecaoCampoApp extends StatelessWidget {
               authBloc: context.read<AuthBloc>(),
             )..add(const HistoryEvent.loadRequested()),
           ),
-          BlocProvider(
-            create: (_) => LoginBloc(authRepository),
-          ),
+          BlocProvider(create: (_) => LoginBloc(authRepository)),
         ],
         child: BlocListener<AuthBloc, AuthState>(
           listenWhen: (previous, current) =>

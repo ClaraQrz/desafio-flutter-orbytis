@@ -165,7 +165,8 @@ class _LocationMapCardState extends State<LocationMapCard> {
           ),
           children: [
             TileLayer(
-              urlTemplate: 'https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&hl=pt-BR',
+              urlTemplate:
+                  'https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&hl=pt-BR',
               userAgentPackageName: 'com.example.inspecampo',
               subdomains: const ['mt0', 'mt1', 'mt2', 'mt3'],
             ),

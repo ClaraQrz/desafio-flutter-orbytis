@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 
-
 class RouteService {
   RouteService({http.Client? client}) : _client = client ?? http.Client();
 
@@ -20,7 +19,9 @@ class RouteService {
       {'overview': 'full', 'geometries': 'geojson'},
     );
 
-    final response = await _client.get(uri).timeout(const Duration(seconds: 10));
+    final response = await _client
+        .get(uri)
+        .timeout(const Duration(seconds: 10));
     if (response.statusCode != 200) {
       throw Exception('Rota indisponível (${response.statusCode}).');
     }
@@ -34,7 +35,6 @@ class RouteService {
     final coordinates =
         (routes.first as Map<String, dynamic>)['geometry']['coordinates']
             as List<dynamic>;
-
 
     return coordinates
         .map((c) => LatLng((c[1] as num).toDouble(), (c[0] as num).toDouble()))

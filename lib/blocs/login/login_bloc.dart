@@ -21,21 +21,14 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     Emitter<LoginState> emit,
   ) async {
     if (event.email.trim().isEmpty || event.password.isEmpty) {
-      emit(
-        const LoginState.failure(
-          'Preencha e-mail e senha.',
-        ),
-      );
+      emit(const LoginState.failure('Preencha e-mail e senha.'));
       return;
     }
 
     emit(const LoginState.loading());
 
     try {
-      final user = await _repo.login(
-        event.email.trim(),
-        event.password,
-      );
+      final user = await _repo.login(event.email.trim(), event.password);
 
       emit(LoginState.success(user));
     } on AuthException catch (e) {

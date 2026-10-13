@@ -25,8 +25,8 @@ class WorkOrdersScreen extends StatelessWidget implements AutoRouteWrapper {
   Widget wrappedRoute(BuildContext context) {
     return BlocProvider(
       create: (context) =>
-      WorkOrdersBloc(context.read<WorkOrdersRepository>())
-        ..add(const WorkOrdersEvent.loadRequested()),
+          WorkOrdersBloc(context.read<WorkOrdersRepository>())
+            ..add(const WorkOrdersEvent.loadRequested()),
       child: this,
     );
   }
@@ -99,61 +99,58 @@ class WorkOrdersScreen extends StatelessWidget implements AutoRouteWrapper {
                       ),
 
                       WorkOrdersFailure(
-                          :final message,
-                          :final isSessionExpired,
+                        :final message,
+                        :final isSessionExpired,
                       ) =>
-                          _RefreshableList(
-                            onRefresh: () => _refresh(context),
-                            children: [
-                              const SizedBox(height: 100),
-                              Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 32,
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        message,
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                          fontFamily: 'Urbanist',
-                                          color: Colors.white70,
-                                        ),
+                        _RefreshableList(
+                          onRefresh: () => _refresh(context),
+                          children: [
+                            const SizedBox(height: 100),
+                            Center(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 32,
+                                ),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      message,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontFamily: 'Urbanist',
+                                        color: Colors.white70,
                                       ),
-                                      const SizedBox(height: 16),
-                                      SizedBox(
-                                        width: 200,
-                                        child: isSessionExpired
-                                            ? FilledButton.icon(
-                                          style: _errorButtonStyle,
-                                          onPressed: () =>
-                                              _sessionExpired(context),
-                                          icon: const Icon(Icons.login),
-                                          label: const Text(
-                                            'Fazer login',
-                                          ),
-                                        )
-                                            : FilledButton.icon(
-                                          style: _errorButtonStyle,
-                                          onPressed: () =>
-                                              _reload(context),
-                                          icon: const Icon(Icons.refresh),
-                                          label: const Text(
-                                            'Tentar novamente',
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    SizedBox(
+                                      width: 200,
+                                      child: isSessionExpired
+                                          ? FilledButton.icon(
+                                              style: _errorButtonStyle,
+                                              onPressed: () =>
+                                                  _sessionExpired(context),
+                                              icon: const Icon(Icons.login),
+                                              label: const Text('Fazer login'),
+                                            )
+                                          : FilledButton.icon(
+                                              style: _errorButtonStyle,
+                                              onPressed: () => _reload(context),
+                                              icon: const Icon(Icons.refresh),
+                                              label: const Text(
+                                                'Tentar novamente',
+                                              ),
+                                            ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
+                        ),
 
                       WorkOrdersLoaded(:final workOrders) ||
                       WorkOrdersRefreshing(
-                          :final workOrders,
+                        :final workOrders,
                       ) => RefreshIndicator(
                         onRefresh: () => _refresh(context),
                         child: ListView.builder(
@@ -348,7 +345,8 @@ class _WorkOrderCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     _InfoRow(
                       icon: Icons.flag_outlined,
-                      text: 'Prioridade: ${labelForPriority(workOrder.priority)}',
+                      text:
+                          'Prioridade: ${labelForPriority(workOrder.priority)}',
                     ),
                   ],
                 ),

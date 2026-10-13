@@ -69,9 +69,7 @@ void main() {
       ),
       expect: () => [
         const InspectionFormState(status: InspectionFormStatus.pickingPhoto),
-        const InspectionFormState(
-          message: 'Não foi possível obter a foto.',
-        ),
+        const InspectionFormState(message: 'Não foi possível obter a foto.'),
         const InspectionFormState(),
       ],
     );

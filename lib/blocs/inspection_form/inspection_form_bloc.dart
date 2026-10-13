@@ -6,7 +6,9 @@ import '../../repositories/inspection_repository.dart';
 import '../../services/photo_service.dart';
 
 part 'inspection_form_event.dart';
+
 part 'inspection_form_state.dart';
+
 part 'inspection_form_bloc.freezed.dart';
 
 class InspectionFormBloc
@@ -17,8 +19,8 @@ class InspectionFormBloc
     required this.workOrderId,
     this.createdBy,
     Inspection? draft,
-  })  : _draft = draft,
-        super(InspectionFormState(photoPath: draft?.photoPath)) {
+  }) : _draft = draft,
+       super(InspectionFormState(photoPath: draft?.photoPath)) {
     on<PhotoSourceSelected>(_onPhotoSelected);
     on<PhotoRemoved>(_onPhotoRemoved);
     on<DraftSubmitted>(_onDraftSubmitted);
@@ -54,19 +56,15 @@ class InspectionFormBloc
         return;
       }
 
-      emit(state.copyWith(
-        status: InspectionFormStatus.idle,
-        photoPath: savedPath,
-      ));
+      emit(
+        state.copyWith(status: InspectionFormStatus.idle, photoPath: savedPath),
+      );
     } catch (_) {
       _notify(emit, 'Não foi possível obter a foto.');
     }
   }
 
-  void _onPhotoRemoved(
-    PhotoRemoved event,
-    Emitter<InspectionFormState> emit,
-  ) {
+  void _onPhotoRemoved(PhotoRemoved event, Emitter<InspectionFormState> emit) {
     emit(state.copyWith(photoPath: null));
   }
 

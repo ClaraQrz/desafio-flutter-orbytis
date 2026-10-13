@@ -34,10 +34,7 @@ class ExpandedMapScreen extends StatelessWidget implements AutoRouteWrapper {
         scrolledUnderElevation: 0,
         title: const Text(
           'Localização',
-          style: TextStyle(
-            fontFamily: 'Urbanist',
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(fontFamily: 'Urbanist', fontWeight: FontWeight.w600),
         ),
       ),
       body: SafeArea(

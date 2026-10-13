@@ -2,16 +2,17 @@ import 'package:internet_connection_checker_plus/internet_connection_checker_plu
 
 class ConnectivityService {
   ConnectivityService({required Uri checkUri, InternetConnection? connection})
-      : _connection = connection ??
-            InternetConnection.createInstance(
-              useDefaultOptions: false,
-              customCheckOptions: [
-                InternetCheckOption(
-                  uri: checkUri,
-                  responseStatusFn: (response) => response.statusCode < 500,
-                ),
-              ],
-            );
+    : _connection =
+          connection ??
+          InternetConnection.createInstance(
+            useDefaultOptions: false,
+            customCheckOptions: [
+              InternetCheckOption(
+                uri: checkUri,
+                responseStatusFn: (response) => response.statusCode < 500,
+              ),
+            ],
+          );
 
   final InternetConnection _connection;
 

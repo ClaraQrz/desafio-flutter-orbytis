@@ -25,13 +25,22 @@ class AppRouter extends RootStackRouter {
   List<AutoRoute> get routes => [
     AutoRoute(page: SplashRoute.page, path: '/', initial: true),
     AutoRoute(page: LoginRoute.page, path: '/login'),
-    AutoRoute(page: WorkOrdersRoute.page, guards: [_guard], path: '/work-orders'),
+    AutoRoute(
+      page: WorkOrdersRoute.page,
+      guards: [_guard],
+      path: '/work-orders',
+    ),
     AutoRoute(page: HistoryRoute.page, guards: [_guard], path: '/history'),
-    AutoRoute(page: InspectionFormRoute.page, guards: [_guard], path: '/inspection'),
+    AutoRoute(
+      page: InspectionFormRoute.page,
+      guards: [_guard],
+      path: '/inspection',
+    ),
     AutoRoute(page: PhotoViewerRoute.page, guards: [_guard], path: '/photo'),
     AutoRoute(page: ExpandedMapRoute.page, guards: [_guard], path: '/map'),
   ];
 }
+
 class SessionGuard extends AutoRouteGuard {
   SessionGuard(this._repository);
 
@@ -39,9 +48,9 @@ class SessionGuard extends AutoRouteGuard {
 
   @override
   Future<void> onNavigation(
-      NavigationResolver resolver,
-      StackRouter router,
-      ) async {
+    NavigationResolver resolver,
+    StackRouter router,
+  ) async {
     try {
       final user = await _repository.getSession();
       if (user != null) {

@@ -24,7 +24,8 @@ class WorkOrdersService {
         );
       }
       throw WorkOrdersException(
-          'Não foi possível carregar as ordens de serviço. Verifique sua conexão.');
+        'Não foi possível carregar as ordens de serviço. Verifique sua conexão.',
+      );
     }
   }
 }

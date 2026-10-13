@@ -18,29 +18,28 @@ class AuthService {
     try {
       final response = await ApiClient.dio.post(
         '/auth/login',
-        data: {
-          'email': email,
-          'password': password,
-        },
+        data: {'email': email, 'password': password},
       );
 
       final data = response.data;
       return LoginResult(
         accessToken: data['accessToken'] as String,
         user: User.fromJson(data['user'] as Map<String, dynamic>),
-     );
+      );
     } on DioException catch (e) {
-        if (e.response?.statusCode == 401) {
-          final data = e.response?.data;
-          final msg = (data is Map && data['message'] != null)
-              ? data['message'] as String
-              : 'Credenciais inválidas';
-          throw AuthException(msg);
-        }
-        if (e.response != null){
-          throw AuthException('Erro no servidor. Tente novamente em instantes.');
-        }
-        throw AuthException('Não foi possível conectar ao servidor. Verifique sua conexão.');
+      if (e.response?.statusCode == 401) {
+        final data = e.response?.data;
+        final msg = (data is Map && data['message'] != null)
+            ? data['message'] as String
+            : 'Credenciais inválidas';
+        throw AuthException(msg);
+      }
+      if (e.response != null) {
+        throw AuthException('Erro no servidor. Tente novamente em instantes.');
+      }
+      throw AuthException(
+        'Não foi possível conectar ao servidor. Verifique sua conexão.',
+      );
     }
   }
 }

@@ -7,4 +7,3 @@ sealed class LoginState with _$LoginState {
   const factory LoginState.success(User user) = LoginSuccess;
   const factory LoginState.failure(String message) = LoginFailure;
 }
-

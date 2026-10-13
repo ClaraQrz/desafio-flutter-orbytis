@@ -19,10 +19,8 @@ class SplashScreen extends StatelessWidget {
             : const LoginRoute();
 
         context.router.replace(route);
-      }, 
-      child: const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      ),
+      },
+      child: const Scaffold(body: Center(child: CircularProgressIndicator())),
     );
   }
 }

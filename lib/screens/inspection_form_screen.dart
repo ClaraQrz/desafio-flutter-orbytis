@@ -191,8 +191,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
       if (isOnline && !historyBloc.isClosed) {
         historyBloc.add(const HistoryEvent.connectivityChanged(true));
       }
-    } catch (_) {
-    }
+    } catch (_) {}
   }
 
   (String, IconData, Color) _statusChip(String status) {

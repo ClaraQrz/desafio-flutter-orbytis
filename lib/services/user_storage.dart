@@ -7,19 +7,24 @@ class UserStorage {
 
   Future<void> saveUser(User user) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_userKey, jsonEncode({
-      'id':user.id,
-      'name':user.name,
-      'email':user.email,
-      'role':user.role
-    }));
+    await prefs.setString(
+      _userKey,
+      jsonEncode({
+        'id': user.id,
+        'name': user.name,
+        'email': user.email,
+        'role': user.role,
+      }),
+    );
   }
-  Future<User?> getUser() async{
+
+  Future<User?> getUser() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_userKey);
-    if(raw == null) return null;
+    if (raw == null) return null;
     return User.fromJson(jsonDecode(raw) as Map<String, dynamic>);
   }
+
   Future<void> clearUser() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_userKey);
